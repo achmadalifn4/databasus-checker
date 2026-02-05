@@ -34,10 +34,16 @@ type WorkspacesResponse struct {
 	Workspaces []WorkspaceDTO `json:"workspaces"`
 }
 
+// FIXED: Update struktur agar bisa baca Version
+type PostgresMeta struct {
+	Version string `json:"version"`
+}
+
 type DatabaseDTO struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Type string `json:"type"`
+	ID         string       `json:"id"`
+	Name       string       `json:"name"`
+	Type       string       `json:"type"`
+	Postgresql PostgresMeta `json:"postgresql"` // Nested JSON
 }
 
 // Structs untuk Backup & Restore
@@ -141,6 +147,26 @@ func (c *DatabasusClient) GetDatabases(workspaceID string) ([]DatabaseDTO, error
 	return result, nil
 }
 
+// NEW HELPER: Ambil detail database spesifik (termasuk version)
+func (c *DatabasusClient) GetDatabaseVersion(workspaceID, databaseID string) (string, error) {
+	// Karena API Databasus tidak punya endpoint GetDatabaseByID, kita pakai GetDatabases filter by workspace
+	// lalu cari manual di array
+	dbs, err := c.GetDatabases(workspaceID)
+	if err != nil {
+		return "", err
+	}
+
+	for _, db := range dbs {
+		if db.ID == databaseID {
+			if db.Postgresql.Version == "" {
+				return "15", nil // Default fallback
+			}
+			return db.Postgresql.Version, nil
+		}
+	}
+	return "15", nil // Default jika tidak ketemu (aman)
+}
+
 // Test Storage Connection (Proxy)
 func (c *DatabasusClient) TestStorageConnection(payload map[string]interface{}) error {
 	settings := models.GetSettings(database.DB)
@@ -177,8 +203,6 @@ func (c *DatabasusClient) TestStorageConnection(payload map[string]interface{}) 
 	return nil
 }
 
-// --- NEW WORKER METHODS ---
-
 func (c *DatabasusClient) GetLatestBackup(databaseID string) (*BackupDTO, error) {
 	settings := models.GetSettings(database.DB)
 	token, err := c.getToken(settings)
@@ -186,7 +210,7 @@ func (c *DatabasusClient) GetLatestBackup(databaseID string) (*BackupDTO, error)
 		return nil, err
 	}
 
-	// FIXED: Urutkan berdasarkan created_at desc untuk ambil yg terbaru
+	// Filter by database_id, sort desc, limit 1
 	url := fmt.Sprintf("%s/api/v1/backups?database_id=%s&limit=1&sort=created_at:desc", settings.DatabasusURL, databaseID)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -211,7 +235,7 @@ func (c *DatabasusClient) GetLatestBackup(databaseID string) (*BackupDTO, error)
 		return nil, errors.New("no backups found for this database")
 	}
 
-	// FIXED: Cek status COMPLETED (sesuai curl user)
+	// Status check: COMPLETED or SUCCESS
 	if result.Backups[0].Status != "COMPLETED" && result.Backups[0].Status != "SUCCESS" {
 		return nil, fmt.Errorf("latest backup status is %s (not COMPLETED)", result.Backups[0].Status)
 	}

@@ -18,6 +18,13 @@ func (s *QueueService) Enqueue(testID string) (*models.Job, error) {
 		return nil, errors.New("invalid test id format")
 	}
 
+	// Cek apakah config ada (sekalian ambil Namanya untuk snapshot)
+	var config models.RestoreTestConfig
+	if err := database.DB.First(&config, "id = ?", parsedID).Error; err != nil {
+		return nil, errors.New("restore test config not found")
+	}
+
+	// Cek duplikasi job pending
 	var count int64
 	database.DB.Model(&models.Job{}).
 		Where("restore_test_config_id = ? AND status IN ('PENDING', 'RUNNING')", parsedID).
@@ -28,7 +35,8 @@ func (s *QueueService) Enqueue(testID string) (*models.Job, error) {
 	}
 
 	job := models.Job{
-		RestoreTestConfigID: parsedID,
+		RestoreTestConfigID: &parsedID,     // Pointer
+		TestSnapshotName:    config.Name,   // Snapshot Nama
 		Status:              "PENDING",
 	}
 
@@ -72,6 +80,7 @@ func (s *QueueService) GetPendingJob() (*models.Job, error) {
 		return nil, err
 	}
 
+	// Preload config. Jika config sudah dihapus (NULL), GORM tidak akan error, fieldnya kosong
 	var fullJob models.Job
 	if err := database.DB.Preload("RestoreTestConfig").First(&fullJob, "id = ?", job.ID).Error; err != nil {
 		return nil, err
@@ -84,21 +93,18 @@ func (s *QueueService) UpdateJob(job *models.Job) {
 	database.DB.Model(job).Select("status", "finished_at", "duration_seconds", "log_output", "last_processed_backup_id").Updates(job)
 }
 
-// GetActiveJobs: Hanya mengambil job yang PENDING atau RUNNING untuk menu Queue
 func (s *QueueService) GetActiveJobs() ([]models.Job, error) {
 	var jobs []models.Job
-	err := database.DB.Preload("RestoreTestConfig").
-		Where("status IN ?", []string{"PENDING", "RUNNING"}).
+	// Tidak perlu Preload Config lagi karena kita pakai Snapshot Name untuk display
+	err := database.DB.Where("status IN ?", []string{"PENDING", "RUNNING"}).
 		Order("created_at asc").
 		Find(&jobs).Error
 	return jobs, err
 }
 
-// GetJobHistory: Hanya mengambil job yang SUCCESS atau FAILED untuk menu Dashboard
 func (s *QueueService) GetJobHistory(limit int) ([]models.Job, error) {
 	var jobs []models.Job
-	err := database.DB.Preload("RestoreTestConfig").
-		Where("status IN ?", []string{"SUCCESS", "FAILED"}).
+	err := database.DB.Where("status IN ?", []string{"SUCCESS", "FAILED"}).
 		Order("finished_at desc").
 		Limit(limit).
 		Find(&jobs).Error

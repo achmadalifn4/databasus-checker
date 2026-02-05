@@ -22,6 +22,7 @@ type EphemeralDB struct {
 	User        string
 	Password    string
 	DBName      string
+	Version     string
 }
 
 // Helper: Cari port host yang kosong
@@ -48,39 +49,49 @@ func randomString(n int) string {
 	return string(b)
 }
 
-func (s *DockerService) SpawnPostgres(jobID string) (*EphemeralDB, error) {
+// FIXED: Tambahkan parameter pgVersion
+func (s *DockerService) SpawnPostgres(jobID string, pgVersion string) (*EphemeralDB, error) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return nil, fmt.Errorf("failed to create docker client: %v", err)
 	}
 
+	// Fallback version
+	if pgVersion == "" {
+		pgVersion = "15"
+	}
+
 	// 1. Generate Credentials
 	dbUser := "user_" + randomString(5)
 	dbPass := "pass_" + randomString(8)
-	// Hapus dash dari UUID agar valid sebagai nama DB
 	cleanJobID := strings.ReplaceAll(jobID, "-", "")
-	// Batasi panjang nama db agar tidak terlalu panjang
 	if len(cleanJobID) > 8 {
 		cleanJobID = cleanJobID[:8]
 	}
 	dbName := "db_" + cleanJobID
-	
+
 	hostPort, err := getFreePort()
 	if err != nil {
 		return nil, fmt.Errorf("failed to find free port: %v", err)
 	}
 
-	// 2. Pull Image (If not exists)
-	imageName := "postgres:15-alpine"
+	// 2. Pull Image (Dynamic Version)
+	// Gunakan alpine agar ringan
+	imageName := fmt.Sprintf("postgres:%s-alpine", pgVersion)
+
+	// Cek apakah image ada, kalau tidak ada PULL dulu
 	_, _, err = cli.ImageInspectWithRaw(ctx, imageName)
 	if client.IsErrNotFound(err) {
+		fmt.Printf("Pulling image %s...\n", imageName)
 		reader, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 		if err != nil {
-			return nil, fmt.Errorf("failed to pull image: %v", err)
+			return nil, fmt.Errorf("failed to pull image %s: %v", imageName, err)
 		}
-		io.Copy(io.Discard, reader)
+		io.Copy(io.Discard, reader) // Tunggu sampai selesai pull
 		reader.Close()
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to inspect image: %v", err)
 	}
 
 	// 3. Create Container
@@ -102,7 +113,7 @@ func (s *DockerService) SpawnPostgres(jobID string) (*EphemeralDB, error) {
 				},
 			},
 		},
-		AutoRemove: true, // Container otomatis hilang kalau distop
+		AutoRemove: true,
 	}
 
 	resp, err := cli.ContainerCreate(ctx, containerConfig, hostConfig, nil, nil, "restore_job_"+jobID)
@@ -121,6 +132,7 @@ func (s *DockerService) SpawnPostgres(jobID string) (*EphemeralDB, error) {
 		User:        dbUser,
 		Password:    dbPass,
 		DBName:      dbName,
+		Version:     pgVersion,
 	}, nil
 }
 
@@ -130,8 +142,7 @@ func (s *DockerService) StopContainer(containerID string) error {
 	if err != nil {
 		return err
 	}
-	
-	// Stop dengan timeout 1 detik (karena AutoRemove=true, dia akan langsung hilang)
+
 	timeout := 1
 	return cli.ContainerStop(ctx, containerID, container.StopOptions{Timeout: &timeout})
 }

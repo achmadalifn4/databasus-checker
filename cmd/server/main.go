@@ -232,7 +232,8 @@ func main() {
 
 	e.POST("/api/tests/:id/delete", func(c echo.Context) error {
 		id := c.Param("id")
-		database.DB.Delete(&models.RestoreTestConfig{}, "id = ?", id)
+		// Gunakan .Unscoped() untuk Hard Delete (Hapus Permanen) agar ID bisa dipakai lagi
+		database.DB.Unscoped().Delete(&models.RestoreTestConfig{}, "id = ?", id)
 		return c.Redirect(http.StatusFound, "/tests")
 	})
 

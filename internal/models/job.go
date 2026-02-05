@@ -8,9 +8,12 @@ import (
 
 type Job struct {
 	Base
-	// FIXED: Ubah dari uint ke uuid.UUID
-	RestoreTestConfigID uuid.UUID         `gorm:"type:uuid;not null;index"`
-	RestoreTestConfig   RestoreTestConfig `gorm:"foreignKey:RestoreTestConfigID"`
+	// FIXED: Gunakan Pointer (*) agar bisa NULL di database
+	RestoreTestConfigID *uuid.UUID         `gorm:"type:uuid;index"` 
+	RestoreTestConfig   RestoreTestConfig  `gorm:"foreignKey:RestoreTestConfigID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
+
+	// FIXED: Simpan nama test disini (Snapshot) agar kalau Config dihapus, nama tetap ada
+	TestSnapshotName string `gorm:"type:varchar(255)"`
 
 	Status                string `gorm:"default:'PENDING';index"`
 	StartedAt             *time.Time
