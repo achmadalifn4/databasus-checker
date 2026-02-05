@@ -4,58 +4,49 @@
     <p class="text-slate-400 mt-1 text-sm">Update channel settings.</p>
 </div>
 
-<form action="/api/notifications/{{.Notification.ID}}/update" method="POST" class="max-w-5xl space-y-8">
+<form action="/api/notifications/{{.Notification.ID}}/update" method="POST" class="max-w-4xl space-y-8">
+    <input type="hidden" id="notifType" name="type" value="{{.Notification.Type}}">
+
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
-        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
-            Channel Info
-        </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Name</label><input type="text" name="name" required value="{{.Notification.Name}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all"></div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Channel Name</label>
+                <input type="text" name="name" required value="{{.Notification.Name}}"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Type</label>
-                <select id="notifType" name="type" required onchange="toggleNotifForm()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option value="TELEGRAM" {{if eq .Notification.Type "TELEGRAM"}}selected{{end}}>Telegram</option>
-                    <option value="EMAIL" {{if eq .Notification.Type "EMAIL"}}selected{{end}}>Email (SMTP)</option>
-                </select>
+                <input type="text" disabled value="{{.Notification.Type}}"
+                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed">
             </div>
         </div>
     </div>
 
-    <div id="configContainer" class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
-        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">2</span>
-            Configuration
-        </h3>
-        <div id="form-TELEGRAM" class="notif-form hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div><label class="block text-sm text-slate-400 mb-1.5">Bot Token</label><input type="text" name="telegram_token" value="{{index .Notification.Config "bot_token"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-purple-500 transition-all"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Chat ID</label><input type="text" name="telegram_chat_id" value="{{index .Notification.Config "chat_id"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-purple-500 transition-all"></div>
-            </div>
-        </div>
-        <div id="form-EMAIL" class="notif-form hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label class="block text-sm text-slate-400 mb-1.5">SMTP Host</label><input type="text" name="email_host" value="{{index .Notification.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">SMTP Port</label><input type="number" name="email_port" value="{{index .Notification.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500"></div>
-            </div>
+    {{if eq .Notification.Type "TELEGRAM"}}
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div><label class="block text-sm text-slate-400 mb-1.5">Bot Token</label><input type="text" name="telegram_token" value="{{index .Notification.Config "bot_token"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            <div><label class="block text-sm text-slate-400 mb-1.5">Chat ID</label><input type="text" name="telegram_chat_id" value="{{index .Notification.Config "chat_id"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
         </div>
     </div>
+    {{end}}
 
-    <div class="flex justify-between items-center pt-4">
-        <button type="button" onclick="testNotification()" class="px-5 py-2.5 rounded-lg border border-slate-600 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-all">Test Channel</button>
-        <div class="flex items-center gap-4">
-            <a href="/notifications" class="text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg active:scale-95 transition-all">Save Changes</button>
+    {{if eq .Notification.Type "EMAIL"}}
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div><label class="block text-sm text-slate-400 mb-1.5">Host</label><input type="text" name="email_host" value="{{index .Notification.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            <div><label class="block text-sm text-slate-400 mb-1.5">Port</label><input type="text" name="email_port" value="{{index .Notification.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            <div><label class="block text-sm text-slate-400 mb-1.5">User</label><input type="text" name="email_user" value="{{index .Notification.Config "user"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            <div><label class="block text-sm text-slate-400 mb-1.5">Pass</label><input type="password" name="email_password" value="{{index .Notification.Config "password"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            <div><label class="block text-sm text-slate-400 mb-1.5">From</label><input type="text" name="email_from" value="{{index .Notification.Config "from_email"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            <div><label class="block text-sm text-slate-400 mb-1.5">To</label><input type="text" name="email_to" value="{{index .Notification.Config "to_email"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
         </div>
+    </div>
+    {{end}}
+
+    <div class="flex justify-end pt-6">
+        <a href="/notifications" class="mr-4 px-5 py-2.5 text-sm text-slate-400 hover:text-white">Cancel</a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg">Save Changes</button>
     </div>
 </form>
-
-<script>
-    function toggleNotifForm() {
-        const type = document.getElementById('notifType').value;
-        document.querySelectorAll('.notif-form').forEach(f => f.classList.add('hidden'));
-        if(type) document.getElementById('form-' + type)?.classList.remove('hidden');
-    }
-    document.addEventListener('DOMContentLoaded', toggleNotifForm);
-</script>
 {{end}}

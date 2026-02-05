@@ -4,20 +4,33 @@
     <p class="text-slate-400 mt-1 text-sm">Configure Databasus connection and application preferences.</p>
 </div>
 
-<form action="/api/settings" method="POST" class="max-w-5xl space-y-8">
+<form action="/api/settings" method="POST" class="max-w-3xl space-y-8">
+    
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
         <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
             Databasus Connection
         </h3>
-        <div class="space-y-6">
+        
+        <div class="space-y-5">
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Databasus URL</label>
-                <input type="text" name="databasus_url" value="{{.Settings.DatabasusURL}}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <input type="text" name="databasus_url" value="{{.Settings.DatabasusURL}}" required
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-600 transition-all">
+                <p class="text-xs text-slate-500 mt-1.5">e.g. http://host.docker.internal:4005</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Username</label><input type="text" name="databasus_user" value="{{.Settings.DatabasusUser}}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"></div>
-                <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label><input type="password" name="databasus_password" value="{{.Settings.DatabasusPassword}}" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Username</label>
+                    <input type="text" name="databasus_user" value="{{.Settings.DatabasusUser}}" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" name="databasus_password" value="{{.Settings.DatabasusPassword}}" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
             </div>
         </div>
     </div>
@@ -27,30 +40,54 @@
             <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">2</span>
             Regional & Retention
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">App Timezone</label>
-                <select name="app_timezone" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option value="Asia/Jakarta" {{if eq .Settings.AppTimezone "Asia/Jakarta"}}selected{{end}}>Asia/Jakarta (WIB)</option>
-                    <option value="UTC" {{if eq .Settings.AppTimezone "UTC"}}selected{{end}}>UTC</option>
-                </select>
+                <div class="relative">
+                    <select name="app_timezone" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="Asia/Jakarta" {{if eq .Settings.AppTimezone "Asia/Jakarta"}}selected{{end}}>Asia/Jakarta (WIB)</option>
+                        <option value="Asia/Makassar" {{if eq .Settings.AppTimezone "Asia/Makassar"}}selected{{end}}>Asia/Makassar (WITA)</option>
+                        <option value="Asia/Jayapura" {{if eq .Settings.AppTimezone "Asia/Jayapura"}}selected{{end}}>Asia/Jayapura (WIT)</option>
+                        <option value="UTC" {{if eq .Settings.AppTimezone "UTC"}}selected{{end}}>UTC</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
             </div>
+
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Databasus API Timezone</label>
-                <select name="databasus_timezone" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all">
-                    <option value="UTC" {{if eq .Settings.DatabasusTimezone "UTC"}}selected{{end}}>UTC</option>
-                    <option value="Asia/Jakarta" {{if eq .Settings.DatabasusTimezone "Asia/Jakarta"}}selected{{end}}>Asia/Jakarta</option>
-                </select>
+                <div class="relative">
+                    <select name="databasus_timezone" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="UTC" {{if eq .Settings.DatabasusTimezone "UTC"}}selected{{end}}>UTC (Default)</option>
+                        <option value="Asia/Jakarta" {{if eq .Settings.DatabasusTimezone "Asia/Jakarta"}}selected{{end}}>Asia/Jakarta</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
             </div>
+
             <div class="md:col-span-2">
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Log Retention (Days)</label>
-                <input type="number" name="log_retention_days" value="{{.Settings.LogRetentionDays}}" min="1" class="w-32 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all">
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Log Retention</label>
+                <div class="flex items-center gap-3">
+                    <input type="number" name="log_retention_days" value="{{.Settings.LogRetentionDays}}" min="1" max="365"
+                        class="w-32 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    <span class="text-sm text-slate-400">Days</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5">Automatically delete test logs older than this period.</p>
             </div>
         </div>
     </div>
 
     <div class="flex justify-end pt-4">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-8 rounded-lg shadow-lg transition-all">Save Configuration</button>
+        <button type="submit" 
+            class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-8 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform active:scale-95 flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            Save Configuration
+        </button>
     </div>
 </form>
 {{end}}

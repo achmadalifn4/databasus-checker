@@ -64,6 +64,24 @@ type RestorePayload struct {
 
 // --- Logic ---
 
+// NEW: Simple Health Check Logic
+func (c *DatabasusClient) CheckHealth() bool {
+	settings := models.GetSettings(database.DB)
+	if settings.DatabasusURL == "" {
+		return false
+	}
+
+	client := &http.Client{Timeout: 5 * time.Second}
+	resp, err := client.Get(settings.DatabasusURL + "/api/v1/system/health")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+
+	// Anggap sehat jika status code 200 OK
+	return resp.StatusCode == http.StatusOK
+}
+
 func (c *DatabasusClient) getToken(settings models.AppSettings) (string, error) {
 	reqBody, _ := json.Marshal(LoginRequest{
 		Email:    settings.DatabasusUser,

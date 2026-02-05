@@ -133,11 +133,16 @@ func main() {
 	databasusClient := services.DatabasusClient{}
 	queueService := services.QueueService{}
 
-	// Route Dashboard (Menampilkan History Log)
+	// Route Dashboard (Menampilkan History Log & Check Health)
 	e.GET("/", func(c echo.Context) error {
 		history, _ := queueService.GetJobHistory(20) // Get last 20 logs
+		
+		// NEW: Panggil fungsi CheckHealth dari DatabasusClient
+		isHealthy := databasusClient.CheckHealth()
+
 		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "dashboard_index.html", echo.Map{
-			"History": history,
+			"History":   history,
+			"IsHealthy": isHealthy, // Kirim ke template
 		}, "dashboard")
 	})
 
@@ -252,20 +257,15 @@ func main() {
 	// --- ROUTE EDIT (UPDATED) ---
 	e.GET("/tests/:id/edit", func(c echo.Context) error {
 		id := c.Param("id")
-		
-		// 1. Ambil Data Test Config
 		var test models.RestoreTestConfig
 		if err := database.DB.First(&test, "id = ?", id).Error; err != nil {
 			return c.Redirect(http.StatusFound, "/tests")
 		}
-
-		// 2. Ambil Data Storage & Notification (Untuk Checkbox List)
 		var storages []models.StorageConfig
 		var notifications []models.NotificationConfig
 		database.DB.Order("name asc").Find(&storages)
 		database.DB.Order("name asc").Find(&notifications)
 
-		// 3. Render tanpa GetWorkspaces (Read-Only)
 		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "tests_edit.html", echo.Map{
 			"Test":          test,
 			"Storages":      storages,
@@ -286,8 +286,6 @@ func main() {
 
 		test.Name = c.FormValue("name")
 		
-		// Logic update Hidden Fields (Database & Workspace)
-		// Jika kosong (karena input disabled), biarkan nilai lama. Jika ada, update.
 		if wsID := c.FormValue("workspace_id"); wsID != "" {
 			test.WorkspaceID = wsID
 		}

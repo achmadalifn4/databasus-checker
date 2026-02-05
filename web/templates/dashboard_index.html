@@ -7,7 +7,12 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
         <h3 class="text-slate-400 text-sm">System Status</h3>
-        <p class="text-2xl font-bold text-green-500 mt-1">Operational</p>
+        
+        {{if .IsHealthy}}
+            <p class="text-2xl font-bold text-green-500 mt-1">Operational</p>
+        {{else}}
+            <p class="text-2xl font-bold text-red-500 mt-1">Databasus Offline</p>
+        {{end}}
     </div>
 </div>
 
