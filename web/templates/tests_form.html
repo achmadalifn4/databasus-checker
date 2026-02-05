@@ -4,56 +4,22 @@
     <p class="text-slate-400 mt-1 text-sm">Configure automated restore testing for a database.</p>
 </div>
 
-{{if .Error}}
-<div class="bg-red-900/20 border border-red-500/20 text-red-300 px-4 py-3 rounded-lg mb-6 flex items-center gap-3 text-sm">
-    <svg class="w-5 h-5 flex-shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-    <span>{{.Error}}</span>
-</div>
-{{end}}
-
-<form action="/api/tests" method="POST" class="max-w-4xl space-y-8">
-    
+<form action="/api/tests" method="POST" class="max-w-5xl space-y-8">
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
-        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
-            Target Database
-        </h3>
-        
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span> Target Database</h3>
         <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Configuration Name</label>
-                <input type="text" name="name" required placeholder="e.g. Daily Production Restore"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-            </div>
-
+            <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Configuration Name</label><input type="text" name="name" required placeholder="e.g. Daily Production Restore" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-1.5">Workspace</label>
-                    <div class="relative">
-                        <select id="workspaceSelect" name="workspace_id" required onchange="fetchDatabases()"
-                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
-                            <option value="" disabled selected>Select a workspace</option>
-                            {{range .Workspaces}}
-                            <option value="{{.ID}}">{{.Name}}</option>
-                            {{end}}
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </div>
+                    <select id="workspaceSelect" name="workspace_id" required onchange="fetchDatabases()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm">
+                        <option value="" disabled selected>Select a workspace</option>
+                        {{range .Workspaces}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+                    </select>
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-1.5">Database</label>
-                    <div class="relative">
-                        <select id="databaseSelect" name="database_id" required disabled
-                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all">
-                            <option value="">Select workspace first</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </div>
-                    </div>
+                    <select id="databaseSelect" name="database_id" required disabled class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm disabled:opacity-50"><option value="">Select workspace first</option></select>
                     <input type="hidden" name="database_name" id="databaseNameInput">
                 </div>
             </div>
@@ -61,74 +27,44 @@
     </div>
 
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
-        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">2</span>
-            Action on Success
-        </h3>
-        
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">2</span> Action on Success</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Upload to Storages</label>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2">
                     {{range .Storages}}
-                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors">
-                        <input type="checkbox" name="storage_ids" value="{{.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900">
-                        <div class="flex flex-col">
-                            <span class="text-sm text-slate-200">{{.Name}}</span>
-                            <span class="text-xs text-slate-500">{{.Type}}</span>
-                        </div>
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors group">
+                        <input type="checkbox" name="storage_ids" value="{{.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500">
+                        <div class="flex flex-col"><span class="text-sm text-slate-300 group-hover:text-white">{{.Name}}</span><span class="text-[10px] text-slate-500 uppercase">{{.Type}}</span></div>
                     </label>
-                    {{else}}
-                        <div class="p-4 text-center text-xs text-slate-500">No storages configured yet.</div>
-                    {{end}}
+                    {{else}}<div class="p-4 text-center text-xs text-slate-500">No storages configured.</div>{{end}}
                 </div>
             </div>
-
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Send Notifications</label>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2">
                     {{range .Notifications}}
-                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors">
-                        <input type="checkbox" name="notification_ids" value="{{.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900">
-                        <div class="flex flex-col">
-                            <span class="text-sm text-slate-200">{{.Name}}</span>
-                            <span class="text-xs text-slate-500">{{.Type}}</span>
-                        </div>
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors group">
+                        <input type="checkbox" name="notification_ids" value="{{.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500">
+                        <div class="flex flex-col"><span class="text-sm text-slate-300 group-hover:text-white">{{.Name}}</span><span class="text-[10px] text-slate-500 uppercase">{{.Type}}</span></div>
                     </label>
-                    {{else}}
-                        <div class="p-4 text-center text-xs text-slate-500">No notifications configured yet.</div>
-                    {{end}}
+                    {{else}}<div class="p-4 text-center text-xs text-slate-500">No notifications configured.</div>{{end}}
                 </div>
             </div>
         </div>
     </div>
 
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
-        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
-            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">3</span>
-            SQL Hooks
-        </h3>
-        
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">3</span> SQL Hooks</h3>
         <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label>
-                <textarea name="pre_restore_script" rows="3" placeholder="-- e.g. DROP SCHEMA public CASCADE;"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin"></textarea>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label>
-                <textarea name="post_restore_script" rows="3" placeholder="-- e.g. SELECT count(*) FROM users;"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin"></textarea>
-            </div>
+            <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label><textarea name="pre_restore_script" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm"></textarea></div>
+            <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label><textarea name="post_restore_script" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm"></textarea></div>
         </div>
     </div>
 
     <div class="flex justify-end items-center gap-4 pt-4">
-        <a href="/tests" class="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform active:scale-95 text-sm">
-            Create Configuration
-        </button>
+        <a href="/tests" class="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white">Cancel</a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg">Create Configuration</button>
     </div>
 </form>
 
@@ -136,35 +72,22 @@
 async function fetchDatabases() {
     const workspaceId = document.getElementById('workspaceSelect').value;
     const dbSelect = document.getElementById('databaseSelect');
-    
-    dbSelect.disabled = true;
-    dbSelect.innerHTML = '<option>Loading databases...</option>';
-
+    dbSelect.disabled = true; dbSelect.innerHTML = '<option>Loading...</option>';
     try {
         const response = await fetch(`/api/proxy/databases?workspace_id=${workspaceId}`);
         if (!response.ok) throw new Error('API Error');
-        
         const databases = await response.json();
-
         dbSelect.innerHTML = '<option value="" disabled selected>Select a database</option>';
         databases.forEach(db => {
             const option = document.createElement('option');
-            option.value = db.id;
-            option.textContent = db.name;
-            option.dataset.name = db.name;
+            option.value = db.id; option.textContent = db.name; option.dataset.name = db.name;
             dbSelect.appendChild(option);
         });
         dbSelect.disabled = false;
-    } catch (error) {
-        dbSelect.innerHTML = '<option>Error fetching databases</option>';
-        console.error(error);
-        alert('Failed to connect to Databasus API.');
-    }
+    } catch (error) { dbSelect.innerHTML = '<option>Error fetching databases</option>'; }
 }
-
 document.getElementById('databaseSelect').addEventListener('change', function() {
-    const selectedOption = this.options[this.selectedIndex];
-    document.getElementById('databaseNameInput').value = selectedOption.dataset.name;
+    this.options[this.selectedIndex] && (document.getElementById('databaseNameInput').value = this.options[this.selectedIndex].dataset.name);
 });
 </script>
 {{end}}

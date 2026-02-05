@@ -4,35 +4,24 @@
     <p class="text-slate-400 mt-1 text-sm">Update configuration for <strong>{{.Storage.Name}}</strong>.</p>
 </div>
 
-<form action="/api/storage/{{.Storage.ID}}/update" method="POST" class="max-w-4xl space-y-8">
-    
+<form action="/api/storage/{{.Storage.ID}}/update" method="POST" class="max-w-5xl space-y-8">
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
         <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
             Basic Information
         </h3>
-
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Storage Name</label>
-                <input type="text" name="name" required value="{{.Storage.Name}}"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <input type="text" name="name" required value="{{.Storage.Name}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all">
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Storage Type</label>
-                <div class="relative">
-                    <select id="storageType" name="type" required onchange="toggleForm()"
-                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
-                        <option value="S3" {{if eq .Storage.Type "S3"}}selected{{end}}>S3 / S3 Compatible</option>
-                        <option value="NAS" {{if eq .Storage.Type "NAS"}}selected{{end}}>NAS (SMB/CIFS)</option>
-                        <option value="FTP" {{if eq .Storage.Type "FTP"}}selected{{end}}>FTP</option>
-                        <option value="SFTP" {{if eq .Storage.Type "SFTP"}}selected{{end}}>SFTP (SSH)</option>
-                        <option value="RCLONE" {{if eq .Storage.Type "RCLONE"}}selected{{end}}>Rclone Config</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
-                </div>
+                <select id="storageType" name="type" required onchange="toggleForm()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all">
+                    <option value="S3" {{if eq .Storage.Type "S3"}}selected{{end}}>S3 Compatible</option>
+                    <option value="SFTP" {{if eq .Storage.Type "SFTP"}}selected{{end}}>SFTP (SSH)</option>
+                    <option value="RCLONE" {{if eq .Storage.Type "RCLONE"}}selected{{end}}>Rclone</option>
+                </select>
             </div>
         </div>
     </div>
@@ -42,101 +31,36 @@
             <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">2</span>
             Connection Details
         </h3>
-        
         <div id="form-S3" class="storage-form hidden space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div><label class="block text-sm text-slate-400 mb-1.5">Bucket Name*</label><input type="text" name="s3_bucket" value="{{index .Storage.Config "bucket"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Region*</label><input type="text" name="s3_region" value="{{index .Storage.Config "region"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Access Key*</label><input type="text" name="s3_access_key" value="{{index .Storage.Config "access_key"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Secret Key*</label><input type="password" name="s3_secret_key" value="{{index .Storage.Config "secret_key"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Bucket</label><input type="text" name="s3_bucket" value="{{index .Storage.Config "bucket"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Region</label><input type="text" name="s3_region" value="{{index .Storage.Config "region"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Access Key</label><input type="text" name="s3_access_key" value="{{index .Storage.Config "access_key"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Secret Key</label><input type="password" name="s3_secret_key" value="{{index .Storage.Config "secret_key"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
                 <div class="md:col-span-2"><label class="block text-sm text-slate-400 mb-1.5">Endpoint</label><input type="text" name="s3_endpoint" value="{{index .Storage.Config "endpoint"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div class="md:col-span-2"><label class="block text-sm text-slate-400 mb-1.5">Prefix</label><input type="text" name="s3_prefix" value="{{index .Storage.Config "prefix"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div class="flex items-center gap-3 pt-2">
-                    <input type="checkbox" name="s3_virtual_host" {{if index .Storage.Config "virtual_host"}}checked{{end}} class="w-4 h-4 rounded bg-slate-900 border-slate-700">
-                    <label class="text-sm text-slate-300">Use Virtual-Hosted-Style</label>
-                </div>
-                <div class="flex items-center gap-3">
-                    <input type="checkbox" name="s3_skip_tls" {{if index .Storage.Config "skip_tls"}}checked{{end}} class="w-4 h-4 rounded bg-slate-900 border-slate-700">
-                    <label class="text-sm text-slate-300">Skip TLS Verify</label>
-                </div>
             </div>
         </div>
-
-        <div id="form-NAS" class="storage-form hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div><label class="block text-sm text-slate-400 mb-1.5">Host*</label><input type="text" name="nas_host" value="{{index .Storage.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Port*</label><input type="number" name="nas_port" value="{{index .Storage.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Share*</label><input type="text" name="nas_share" value="{{index .Storage.Config "share"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Path</label><input type="text" name="nas_path" value="{{index .Storage.Config "path"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">User*</label><input type="text" name="nas_user" value="{{index .Storage.Config "user"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Password*</label><input type="password" name="nas_password" value="{{index .Storage.Config "password"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Domain</label><input type="text" name="nas_domain" value="{{index .Storage.Config "domain"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div class="flex items-center gap-3 mt-6"><input type="checkbox" name="nas_ssl" {{if index .Storage.Config "ssl"}}checked{{end}} class="w-4 h-4 rounded bg-slate-900 border-slate-700"><label class="text-sm text-slate-300">Use SSL</label></div>
-            </div>
-        </div>
-
-        <div id="form-FTP" class="storage-form hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div><label class="block text-sm text-slate-400 mb-1.5">Host*</label><input type="text" name="ftp_host" value="{{index .Storage.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Port*</label><input type="number" name="ftp_port" value="{{index .Storage.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">User*</label><input type="text" name="ftp_user" value="{{index .Storage.Config "user"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Password*</label><input type="password" name="ftp_password" value="{{index .Storage.Config "password"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div class="md:col-span-2"><label class="block text-sm text-slate-400 mb-1.5">Remote Path</label><input type="text" name="ftp_path" value="{{index .Storage.Config "path"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div class="flex items-center gap-3"><input type="checkbox" name="ftp_ssl" {{if index .Storage.Config "ssl"}}checked{{end}} class="w-4 h-4 rounded bg-slate-900 border-slate-700"><label class="text-sm text-slate-300">Use FTPS</label></div>
-            </div>
-        </div>
-
         <div id="form-SFTP" class="storage-form hidden space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div><label class="block text-sm text-slate-400 mb-1.5">Host*</label><input type="text" name="sftp_host" value="{{index .Storage.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">Port*</label><input type="number" name="sftp_port" value="{{index .Storage.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div><label class="block text-sm text-slate-400 mb-1.5">User*</label><input type="text" name="sftp_user" value="{{index .Storage.Config "user"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1.5">Auth Method</label>
-                    <select id="sftpAuthMethod" name="sftp_auth_method" onchange="toggleSftpAuth()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm">
-                        <option value="password" {{if eq (index .Storage.Config "auth_method") "password"}}selected{{end}}>Password</option>
-                        <option value="key" {{if eq (index .Storage.Config "auth_method") "key"}}selected{{end}}>Private Key</option>
-                    </select>
-                </div>
-                
-                <div id="sftp-password-field" class="md:col-span-2">
-                    <label class="block text-sm text-slate-400 mb-1.5">Password</label>
-                    <input type="password" name="sftp_password" value="{{index .Storage.Config "password"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm">
-                </div>
-                
-                <div id="sftp-key-field" class="md:col-span-2 hidden">
-                    <label class="block text-sm text-slate-400 mb-1.5">Private Key</label>
-                    <textarea name="sftp_private_key" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm font-mono">{{index .Storage.Config "private_key"}}</textarea>
-                </div>
-
-                <div class="md:col-span-2"><label class="block text-sm text-slate-400 mb-1.5">Remote Path</label><input type="text" name="sftp_path" value="{{index .Storage.Config "path"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-                <div class="flex items-center gap-3"><input type="checkbox" name="sftp_skip_host_key" {{if index .Storage.Config "skip_host_key"}}checked{{end}} class="w-4 h-4 rounded bg-slate-900 border-slate-700"><label class="text-sm text-slate-300">Skip Host Key</label></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Host</label><input type="text" name="sftp_host" value="{{index .Storage.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Port</label><input type="number" name="sftp_port" value="{{index .Storage.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">User</label><input type="text" name="sftp_user" value="{{index .Storage.Config "user"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Password</label><input type="password" name="sftp_password" value="{{index .Storage.Config "password"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
             </div>
         </div>
-
         <div id="form-RCLONE" class="storage-form hidden space-y-6">
             <div class="space-y-5">
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1.5">Rclone Config</label>
-                    <textarea name="rclone_config" rows="8" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm font-mono">{{index .Storage.Config "config_content"}}</textarea>
-                </div>
-                <div>
-                    <label class="block text-sm text-slate-400 mb-1.5">Remote Path</label>
-                    <input type="text" name="rclone_path" value="{{index .Storage.Config "remote_path"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm">
-                </div>
-            </div>
-        </div>
+               <div><label class="block text-sm text-slate-400 mb-1.5">Rclone Config</label><textarea name="rclone_config" rows="6" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm">{{index .Storage.Config "config_content"}}</textarea></div>
+               <div><label class="block text-sm text-slate-400 mb-1.5">Remote Path</label><input type="text" name="rclone_path" value="{{index .Storage.Config "remote_path"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+           </div>
+       </div>
     </div>
 
-    <div class="flex justify-between items-center pt-6 border-t border-slate-700/50">
-        <button type="button" onclick="testConnection()" id="testBtn"
-            class="px-5 py-2.5 rounded-lg border border-slate-600 text-slate-300 font-medium text-sm hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-all">
-            Test Connection
-        </button>
-
-        <div class="flex items-center gap-3">
+    <div class="flex justify-between items-center pt-4">
+        <button type="button" onclick="testConnection()" class="px-5 py-2.5 rounded-lg border border-slate-600 text-slate-300 font-medium text-sm hover:bg-slate-700 transition-all">Test Connection</button>
+        <div class="flex items-center gap-4">
             <a href="/storage" class="px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
-            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg">Save Changes</button>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg active:scale-95 transition-all">Save Changes</button>
         </div>
     </div>
 </form>
@@ -144,61 +68,9 @@
 <script>
 function toggleForm() {
     const type = document.getElementById('storageType').value;
-    const forms = document.querySelectorAll('.storage-form');
-    forms.forEach(f => f.classList.add('hidden'));
-    
-    if (type) {
-        const activeForm = document.getElementById('form-' + type);
-        if (activeForm) activeForm.classList.remove('hidden');
-    }
+    document.querySelectorAll('.storage-form').forEach(f => f.classList.add('hidden'));
+    if(type) document.getElementById('form-'+type)?.classList.remove('hidden');
 }
-
-function toggleSftpAuth() {
-    const method = document.getElementById('sftpAuthMethod').value;
-    const passField = document.getElementById('sftp-password-field');
-    const keyField = document.getElementById('sftp-key-field');
-
-    if (method === 'password') {
-        passField.classList.remove('hidden');
-        keyField.classList.add('hidden');
-    } else {
-        passField.classList.add('hidden');
-        keyField.classList.remove('hidden');
-    }
-}
-
-async function testConnection() {
-    const btn = document.getElementById('testBtn');
-    const originalText = 'Test Connection'; 
-    const form = document.querySelector('form');
-    
-    btn.disabled = true;
-    btn.innerHTML = 'Testing...';
-    btn.classList.add('opacity-75', 'cursor-not-allowed');
-
-    try {
-        const formData = new FormData(form);
-        const response = await fetch('/api/storage/test-connection', {
-            method: 'POST',
-            body: formData
-        });
-        const result = await response.json();
-        alert(response.ok ? "Success: " + result.message : "Failed: " + result.message);
-    } catch (error) {
-        alert("Network Error");
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-        btn.classList.remove('opacity-75', 'cursor-not-allowed');
-    }
-}
-
-// Initialize on Load
-document.addEventListener('DOMContentLoaded', function() {
-    toggleForm();
-    if (document.getElementById('storageType').value === 'SFTP') {
-        toggleSftpAuth();
-    }
-});
+document.addEventListener('DOMContentLoaded', toggleForm);
 </script>
 {{end}}

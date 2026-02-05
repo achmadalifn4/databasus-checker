@@ -113,7 +113,7 @@ func (s *DockerService) SpawnPostgres(jobID string, pgVersion string) (*Ephemera
 				},
 			},
 		},
-		AutoRemove: true,
+		AutoRemove: false,
 	}
 
 	resp, err := cli.ContainerCreate(ctx, containerConfig, hostConfig, nil, nil, "restore_job_"+jobID)

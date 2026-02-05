@@ -4,37 +4,31 @@
     <p class="text-slate-400 mt-1 text-sm">Update settings for <strong>{{.Test.Name}}</strong>.</p>
 </div>
 
-<form action="/api/tests/{{.Test.ID}}/update" method="POST" class="max-w-4xl space-y-8">
-    
+<form action="/api/tests/{{.Test.ID}}/update" method="POST" class="max-w-5xl space-y-8">
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
         <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
             <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
             General Info
         </h3>
-
         <div class="space-y-6">
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Configuration Name</label>
                 <input type="text" name="name" required value="{{.Test.Name}}"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 transition-all">
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="opacity-60">
-                    <label class="block text-sm font-medium text-slate-500 mb-1.5">Target Database <span class="text-xs text-slate-600">(Locked)</span></label>
-                    <input type="text" disabled value="{{.Test.DatabasusDatabaseName}}"
-                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed font-medium">
+                    <label class="block text-sm font-medium text-slate-500 mb-1.5">Database (Locked)</label>
+                    <input type="text" disabled value="{{.Test.DatabasusDatabaseName}}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed">
                     <input type="hidden" name="database_name" value="{{.Test.DatabasusDatabaseName}}">
                 </div>
                 <div class="opacity-60">
-                    <label class="block text-sm font-medium text-slate-500 mb-1.5">Database ID <span class="text-xs text-slate-600">(Locked)</span></label>
-                    <input type="text" disabled value="{{.Test.DatabasusDatabaseID}}"
-                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm font-mono cursor-not-allowed">
+                    <label class="block text-sm font-medium text-slate-500 mb-1.5">Workspace (Locked)</label>
+                    <input type="text" disabled value="{{.Test.WorkspaceID}}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed">
                     <input type="hidden" name="workspace_id" value="{{.Test.WorkspaceID}}">
                     <input type="hidden" name="database_id" value="{{.Test.DatabasusDatabaseID}}">
                 </div>
             </div>
-            <p class="text-xs text-slate-500 italic">* To test a different database, please create a new configuration.</p>
         </div>
     </div>
 
@@ -43,44 +37,30 @@
             <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">2</span>
             Action on Success
         </h3>
-        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Upload to Storages</label>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin">
                     {{$selectedStorages := .Test.StorageIDs}}
                     {{range $storage := .Storages}}
-                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors group">
-                        <input type="checkbox" name="storage_ids" value="{{$storage.ID}}" 
-                            class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer group">
+                        <input type="checkbox" name="storage_ids" value="{{$storage.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500"
                             {{range $sel := $selectedStorages}}{{if eq $sel $storage.ID.String}}checked{{end}}{{end}}>
-                        <div class="flex flex-col">
-                            <span class="text-sm text-slate-300 group-hover:text-white">{{$storage.Name}}</span>
-                            <span class="text-[10px] text-slate-500 uppercase">{{$storage.Type}}</span>
-                        </div>
+                        <div class="flex flex-col"><span class="text-sm text-slate-300 group-hover:text-white">{{$storage.Name}}</span><span class="text-[10px] text-slate-500 uppercase">{{$storage.Type}}</span></div>
                     </label>
-                    {{else}}
-                        <div class="p-4 text-center text-xs text-slate-500">No storages configured yet.</div>
                     {{end}}
                 </div>
             </div>
-
             <div>
-                <label class="block text-sm font-medium text-slate-300 mb-2">Send Notifications</label>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Notifications</label>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin">
                     {{$selectedNotifs := .Test.NotificationIDs}}
                     {{range $notif := .Notifications}}
-                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors group">
-                        <input type="checkbox" name="notification_ids" value="{{$notif.ID}}" 
-                            class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer group">
+                        <input type="checkbox" name="notification_ids" value="{{$notif.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500"
                             {{range $sel := $selectedNotifs}}{{if eq $sel $notif.ID.String}}checked{{end}}{{end}}>
-                        <div class="flex flex-col">
-                            <span class="text-sm text-slate-300 group-hover:text-white">{{$notif.Name}}</span>
-                            <span class="text-[10px] text-slate-500 uppercase">{{$notif.Type}}</span>
-                        </div>
+                        <div class="flex flex-col"><span class="text-sm text-slate-300 group-hover:text-white">{{$notif.Name}}</span><span class="text-[10px] text-slate-500 uppercase">{{$notif.Type}}</span></div>
                     </label>
-                    {{else}}
-                        <div class="p-4 text-center text-xs text-slate-500">No notifications configured yet.</div>
                     {{end}}
                 </div>
             </div>
@@ -92,27 +72,15 @@
             <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">3</span>
             SQL Hooks
         </h3>
-        
         <div class="space-y-6">
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label>
-                <textarea name="pre_restore_script" rows="3" 
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin">{{.Test.PreRestoreScript}}</textarea>
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label>
-                <textarea name="post_restore_script" rows="3"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin">{{.Test.PostRestoreScript}}</textarea>
-            </div>
+            <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label><textarea name="pre_restore_script" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 transition-all">{{.Test.PreRestoreScript}}</textarea></div>
+            <div><label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label><textarea name="post_restore_script" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 transition-all">{{.Test.PostRestoreScript}}</textarea></div>
         </div>
     </div>
 
-    <div class="flex justify-end items-center gap-4 pt-4">
-        <a href="/tests" class="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform active:scale-95 text-sm">
-            Save Changes
-        </button>
+    <div class="flex justify-end gap-4 pt-4">
+        <a href="/tests" class="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white">Cancel</a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg transition-all active:scale-95">Save Changes</button>
     </div>
 </form>
 {{end}}
