@@ -18,7 +18,7 @@
             {{range .Jobs}}
             <tr class="hover:bg-slate-700/20 transition-colors animate-pulse bg-slate-800/50">
                 <td class="px-6 py-4 font-mono text-xs text-slate-500">{{.ID}}</td>
-                <td class="px-6 py-4 font-medium text-white">{{.RestoreTestConfig.Name}}</td>
+                <td class="px-6 py-4 font-medium text-white">{{.TestSnapshotName}}</td>
                 <td class="px-6 py-4">
                     {{if eq .Status "RUNNING"}}
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">

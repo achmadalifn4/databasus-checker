@@ -20,17 +20,21 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="opacity-70">
+                <div class="opacity-60">
                     <label class="block text-sm font-medium text-slate-500 mb-1.5">Target Database <span class="text-xs text-slate-600">(Locked)</span></label>
                     <input type="text" disabled value="{{.Test.DatabasusDatabaseName}}"
-                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed">
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed font-medium">
+                    <input type="hidden" name="database_name" value="{{.Test.DatabasusDatabaseName}}">
                 </div>
-                <div class="opacity-70">
+                <div class="opacity-60">
                     <label class="block text-sm font-medium text-slate-500 mb-1.5">Database ID <span class="text-xs text-slate-600">(Locked)</span></label>
                     <input type="text" disabled value="{{.Test.DatabasusDatabaseID}}"
                         class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm font-mono cursor-not-allowed">
+                    <input type="hidden" name="workspace_id" value="{{.Test.WorkspaceID}}">
+                    <input type="hidden" name="database_id" value="{{.Test.DatabasusDatabaseID}}">
                 </div>
             </div>
+            <p class="text-xs text-slate-500 italic">* To test a different database, please create a new configuration.</p>
         </div>
     </div>
 
@@ -42,33 +46,43 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Upload to Storages (Multiple)</label>
-                <select name="storage_ids" multiple size="4"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Upload to Storages</label>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
                     {{$selectedStorages := .Test.StorageIDs}}
-                    {{range .Storages}}
-                        <option value="{{.ID}}" 
-                        {{range $sel := $selectedStorages}}{{if eq $sel .ID.String}}selected{{end}}{{end}}>
-                        {{.Name}} ({{.Type}})
-                        </option>
+                    {{range $storage := .Storages}}
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors group">
+                        <input type="checkbox" name="storage_ids" value="{{$storage.ID}}" 
+                            class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
+                            {{range $sel := $selectedStorages}}{{if eq $sel $storage.ID.String}}checked{{end}}{{end}}>
+                        <div class="flex flex-col">
+                            <span class="text-sm text-slate-300 group-hover:text-white">{{$storage.Name}}</span>
+                            <span class="text-[10px] text-slate-500 uppercase">{{$storage.Type}}</span>
+                        </div>
+                    </label>
+                    {{else}}
+                        <div class="p-4 text-center text-xs text-slate-500">No storages configured yet.</div>
                     {{end}}
-                </select>
-                <p class="text-xs text-slate-500 mt-1.5">Hold Ctrl/Cmd to select multiple.</p>
+                </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Send Notifications To (Multiple)</label>
-                <select name="notification_ids" multiple size="4"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Send Notifications</label>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
                     {{$selectedNotifs := .Test.NotificationIDs}}
-                    {{range .Notifications}}
-                        <option value="{{.ID}}" 
-                        {{range $sel := $selectedNotifs}}{{if eq $sel .ID.String}}selected{{end}}{{end}}>
-                        {{.Name}} ({{.Type}})
-                        </option>
+                    {{range $notif := .Notifications}}
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors group">
+                        <input type="checkbox" name="notification_ids" value="{{$notif.ID}}" 
+                            class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900"
+                            {{range $sel := $selectedNotifs}}{{if eq $sel $notif.ID.String}}checked{{end}}{{end}}>
+                        <div class="flex flex-col">
+                            <span class="text-sm text-slate-300 group-hover:text-white">{{$notif.Name}}</span>
+                            <span class="text-[10px] text-slate-500 uppercase">{{$notif.Type}}</span>
+                        </div>
+                    </label>
+                    {{else}}
+                        <div class="p-4 text-center text-xs text-slate-500">No notifications configured yet.</div>
                     {{end}}
-                </select>
-                <p class="text-xs text-slate-500 mt-1.5">Hold Ctrl/Cmd to select multiple.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -83,13 +97,13 @@
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label>
                 <textarea name="pre_restore_script" rows="3" 
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed">{{.Test.PreRestoreScript}}</textarea>
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin">{{.Test.PreRestoreScript}}</textarea>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label>
                 <textarea name="post_restore_script" rows="3"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed">{{.Test.PostRestoreScript}}</textarea>
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin">{{.Test.PostRestoreScript}}</textarea>
             </div>
         </div>
     </div>

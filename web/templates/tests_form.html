@@ -68,25 +68,37 @@
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Upload to Storages (Multiple)</label>
-                <select name="storage_ids" multiple size="4"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Upload to Storages</label>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
                     {{range .Storages}}
-                    <option value="{{.ID}}">{{.Name}} ({{.Type}})</option>
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors">
+                        <input type="checkbox" name="storage_ids" value="{{.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900">
+                        <div class="flex flex-col">
+                            <span class="text-sm text-slate-200">{{.Name}}</span>
+                            <span class="text-xs text-slate-500">{{.Type}}</span>
+                        </div>
+                    </label>
+                    {{else}}
+                        <div class="p-4 text-center text-xs text-slate-500">No storages configured yet.</div>
                     {{end}}
-                </select>
-                <p class="text-xs text-slate-500 mt-1.5">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</p>
+                </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Send Notifications To (Multiple)</label>
-                <select name="notification_ids" multiple size="4"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                <label class="block text-sm font-medium text-slate-300 mb-2">Send Notifications</label>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg h-48 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-800">
                     {{range .Notifications}}
-                    <option value="{{.ID}}">{{.Name}} ({{.Type}})</option>
+                    <label class="flex items-center space-x-3 p-2 hover:bg-slate-800 rounded cursor-pointer transition-colors">
+                        <input type="checkbox" name="notification_ids" value="{{.ID}}" class="w-4 h-4 rounded bg-slate-800 border-slate-600 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900">
+                        <div class="flex flex-col">
+                            <span class="text-sm text-slate-200">{{.Name}}</span>
+                            <span class="text-xs text-slate-500">{{.Type}}</span>
+                        </div>
+                    </label>
+                    {{else}}
+                        <div class="p-4 text-center text-xs text-slate-500">No notifications configured yet.</div>
                     {{end}}
-                </select>
-                <p class="text-xs text-slate-500 mt-1.5">Hold Ctrl (Windows) or Cmd (Mac) to select multiple.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -101,13 +113,13 @@
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label>
                 <textarea name="pre_restore_script" rows="3" placeholder="-- e.g. DROP SCHEMA public CASCADE;"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed"></textarea>
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin"></textarea>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label>
                 <textarea name="post_restore_script" rows="3" placeholder="-- e.g. SELECT count(*) FROM users;"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed"></textarea>
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed scrollbar-thin"></textarea>
             </div>
         </div>
     </div>

@@ -230,24 +230,42 @@ func main() {
 		return c.Redirect(http.StatusFound, "/tests")
 	})
 
+	// FIXED: Unlink Jobs First, Then Hard Delete
 	e.POST("/api/tests/:id/delete", func(c echo.Context) error {
 		id := c.Param("id")
-		// Gunakan .Unscoped() untuk Hard Delete (Hapus Permanen) agar ID bisa dipakai lagi
-		database.DB.Unscoped().Delete(&models.RestoreTestConfig{}, "id = ?", id)
+
+		// 1. Unlink Jobs (Set parent_id to NULL to keep history)
+		if err := database.DB.Model(&models.Job{}).
+			Where("restore_test_config_id = ?", id).
+			Update("restore_test_config_id", nil).Error; err != nil {
+			return c.String(http.StatusInternalServerError, "Failed to unlink jobs: "+err.Error())
+		}
+
+		// 2. Delete the Test Config (Hard Delete)
+		if err := database.DB.Unscoped().Delete(&models.RestoreTestConfig{}, "id = ?", id).Error; err != nil {
+			return c.String(http.StatusInternalServerError, "Failed to delete test config: "+err.Error())
+		}
+
 		return c.Redirect(http.StatusFound, "/tests")
 	})
 
+	// --- ROUTE EDIT (UPDATED) ---
 	e.GET("/tests/:id/edit", func(c echo.Context) error {
 		id := c.Param("id")
+		
+		// 1. Ambil Data Test Config
 		var test models.RestoreTestConfig
 		if err := database.DB.First(&test, "id = ?", id).Error; err != nil {
 			return c.Redirect(http.StatusFound, "/tests")
 		}
+
+		// 2. Ambil Data Storage & Notification (Untuk Checkbox List)
 		var storages []models.StorageConfig
 		var notifications []models.NotificationConfig
-		database.DB.Find(&storages)
-		database.DB.Find(&notifications)
+		database.DB.Order("name asc").Find(&storages)
+		database.DB.Order("name asc").Find(&notifications)
 
+		// 3. Render tanpa GetWorkspaces (Read-Only)
 		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "tests_edit.html", echo.Map{
 			"Test":          test,
 			"Storages":      storages,
@@ -267,6 +285,19 @@ func main() {
 		notificationIDs := c.Request().Form["notification_ids"]
 
 		test.Name = c.FormValue("name")
+		
+		// Logic update Hidden Fields (Database & Workspace)
+		// Jika kosong (karena input disabled), biarkan nilai lama. Jika ada, update.
+		if wsID := c.FormValue("workspace_id"); wsID != "" {
+			test.WorkspaceID = wsID
+		}
+		if dbID := c.FormValue("database_id"); dbID != "" {
+			test.DatabasusDatabaseID = dbID
+		}
+		if dbName := c.FormValue("database_name"); dbName != "" {
+			test.DatabasusDatabaseName = dbName
+		}
+
 		test.PreRestoreScript = c.FormValue("pre_restore_script")
 		test.PostRestoreScript = c.FormValue("post_restore_script")
 		test.StorageIDs = storageIDs

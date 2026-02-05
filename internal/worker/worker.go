@@ -214,8 +214,6 @@ func (w *Worker) processJob(job *models.Job) {
 	if len(storageIDs) > 0 {
 		logPrint("Starting Upload Process...")
 		
-		// FIXED: Cari file fisik berdasarkan ID karena Databasus biasanya menamai file dengan UUID
-		// Kita cari file apapun yang dimulai dengan UUID backup di folder /backups
 		searchPattern := filepath.Join(os.Getenv("BACKUP_PATH"), backup.ID + "*")
 		matches, err := filepath.Glob(searchPattern)
 		
@@ -223,14 +221,12 @@ func (w *Worker) processJob(job *models.Job) {
 			logPrint("ERROR: Backup file not found locally using pattern: %s", searchPattern)
 			logPrint("Ensure Databasus and Checker share the volume and Databasus has finished writing.")
 			
-			// SET STATUS FAILED karena Upload Gagal
 			finalStatus = "FAILED"
 			finalMessage = "Restore success but Upload failed: Local file not found."
 		} else {
-			localFilePath := matches[0] // Ambil match pertama
+			localFilePath := matches[0]
 			logPrint("Found local backup file: %s", localFilePath)
 
-			// Generate Custom Filename: {dbname}-{timestamp}-backup.dump
 			timestamp := backup.CreatedAt.Format("20060102_150405")
 			remoteFileName := fmt.Sprintf("%s-%s-backup.dump", job.RestoreTestConfig.DatabasusDatabaseName, timestamp)
 			
@@ -245,7 +241,6 @@ func (w *Worker) processJob(job *models.Job) {
 					logPrint("Uploading to %s (%s)...", storage.Name, storage.Type)
 					if err := w.UploaderService.UploadToStorage(storage, localFilePath, remoteFileName); err != nil {
 						logPrint("ERROR: Upload failed: %v", err)
-						// SET STATUS FAILED jika salah satu upload gagal
 						finalStatus = "FAILED"
 						finalMessage = fmt.Sprintf("Restore success but Upload to %s failed: %v", storage.Name, err)
 					} else {
@@ -260,8 +255,18 @@ func (w *Worker) processJob(job *models.Job) {
 	logPrint("Process Completed with status: %s", finalStatus)
 	job.MarkFinished(finalStatus, logs.String())
 	job.LastProcessedBackupID = backup.ID
-	w.QueueService.UpdateJob(job)
+	w.QueueService.UpdateJob(job) // Update tabel jobs
+
+	// FIXED: Update tabel Parent (RestoreTestConfig) agar ID muncul di list view
+	if finalStatus == "SUCCESS" {
+		if job.RestoreTestConfigID != nil {
+			if err := database.DB.Model(&models.RestoreTestConfig{}).
+				Where("id = ?", job.RestoreTestConfigID).
+				Update("last_processed_backup_id", backup.ID).Error; err != nil {
+				logPrint("WARN: Failed to update config last_processed_id: %v", err)
+			}
+		}
+	}
 	
-	// Kirim notifikasi sesuai status akhir (Sukses atau Gagal Upload)
 	sendNotification(finalStatus == "SUCCESS", finalMessage)
 }

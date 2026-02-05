@@ -5,9 +5,13 @@
 </div>
 
 <form action="/api/notifications/{{.Notification.ID}}/update" method="POST" class="max-w-4xl space-y-8">
-    <input type="hidden" id="notifType" name="type" value="{{.Notification.Type}}">
-
+    
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
+            Channel Info
+        </h3>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-1.5">Channel Name</label>
@@ -15,38 +19,99 @@
                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-300 mb-1.5">Type</label>
-                <input type="text" disabled value="{{.Notification.Type}}"
-                    class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed">
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Channel Type</label>
+                <div class="relative">
+                    <select id="notifType" name="type" required onchange="toggleNotifForm()"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                        <option value="TELEGRAM" {{if eq .Notification.Type "TELEGRAM"}}selected{{end}}>Telegram</option>
+                        <option value="EMAIL" {{if eq .Notification.Type "EMAIL"}}selected{{end}}>Email (SMTP)</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    {{if eq .Notification.Type "TELEGRAM"}}
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div><label class="block text-sm text-slate-400 mb-1.5">Bot Token</label><input type="text" name="telegram_token" value="{{index .Notification.Config "bot_token"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-            <div><label class="block text-sm text-slate-400 mb-1.5">Chat ID</label><input type="text" name="telegram_chat_id" value="{{index .Notification.Config "chat_id"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+    <div id="configContainer" class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">2</span>
+            Configuration Details
+        </h3>
+        
+        <div id="form-TELEGRAM" class="notif-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div><label class="block text-sm text-slate-400 mb-1.5">Bot Token</label><input type="text" name="telegram_token" value="{{index .Notification.Config "bot_token"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Chat ID</label><input type="text" name="telegram_chat_id" value="{{index .Notification.Config "chat_id"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            </div>
+        </div>
+
+        <div id="form-EMAIL" class="notif-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div><label class="block text-sm text-slate-400 mb-1.5">SMTP Host</label><input type="text" name="email_host" value="{{index .Notification.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">SMTP Port</label><input type="number" name="email_port" value="{{index .Notification.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Sender (From)</label><input type="email" name="email_from" value="{{index .Notification.Config "from_email"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Recipient (To)</label><input type="email" name="email_to" value="{{index .Notification.Config "to_email"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Username</label><input type="text" name="email_user" value="{{index .Notification.Config "user"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+                <div><label class="block text-sm text-slate-400 mb-1.5">Password</label><input type="password" name="email_password" value="{{index .Notification.Config "password"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+            </div>
         </div>
     </div>
-    {{end}}
 
-    {{if eq .Notification.Type "EMAIL"}}
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div><label class="block text-sm text-slate-400 mb-1.5">Host</label><input type="text" name="email_host" value="{{index .Notification.Config "host"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-            <div><label class="block text-sm text-slate-400 mb-1.5">Port</label><input type="text" name="email_port" value="{{index .Notification.Config "port"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-            <div><label class="block text-sm text-slate-400 mb-1.5">User</label><input type="text" name="email_user" value="{{index .Notification.Config "user"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-            <div><label class="block text-sm text-slate-400 mb-1.5">Pass</label><input type="password" name="email_password" value="{{index .Notification.Config "password"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-            <div><label class="block text-sm text-slate-400 mb-1.5">From</label><input type="text" name="email_from" value="{{index .Notification.Config "from_email"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
-            <div><label class="block text-sm text-slate-400 mb-1.5">To</label><input type="text" name="email_to" value="{{index .Notification.Config "to_email"}}" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm"></div>
+    <div class="flex justify-between items-center pt-6 border-t border-slate-700/50">
+        <button type="button" onclick="testNotification()" id="testBtn"
+            class="px-5 py-2.5 rounded-lg border border-slate-600 text-slate-300 font-medium text-sm hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-all">
+            Test Channel
+        </button>
+
+        <div class="flex items-center gap-3">
+            <a href="/notifications" class="px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg">Save Changes</button>
         </div>
-    </div>
-    {{end}}
-
-    <div class="flex justify-end pt-6">
-        <a href="/notifications" class="mr-4 px-5 py-2.5 text-sm text-slate-400 hover:text-white">Cancel</a>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg">Save Changes</button>
     </div>
 </form>
+
+<script>
+function toggleNotifForm() {
+    const type = document.getElementById('notifType').value;
+    const forms = document.querySelectorAll('.notif-form');
+    forms.forEach(f => f.classList.add('hidden'));
+    
+    if (type) {
+        const activeForm = document.getElementById('form-' + type);
+        if (activeForm) activeForm.classList.remove('hidden');
+    }
+}
+
+async function testNotification() {
+    const btn = document.getElementById('testBtn');
+    const originalText = btn.innerHTML;
+    const form = document.querySelector('form');
+    
+    btn.disabled = true;
+    btn.innerHTML = 'Sending...';
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+    try {
+        const formData = new FormData(form);
+        const response = await fetch('/api/notifications/test-connection', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+        alert(response.ok ? "Success: " + result.message : "Failed: " + result.message);
+    } catch (error) {
+        alert("Network Error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    toggleNotifForm();
+});
+</script>
 {{end}}
