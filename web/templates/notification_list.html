@@ -1,0 +1,61 @@
+{{define "content"}}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Notification Channels</h1>
+        <p class="text-slate-400 mt-1 text-sm">Manage alerts for backup restoration status.</p>
+    </div>
+    <a href="/notifications/create" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Add Channel
+    </a>
+</div>
+
+<div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-sm">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-850/50 border-b border-slate-700 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+                <th class="px-6 py-4">Name</th>
+                <th class="px-6 py-4">Type</th>
+                <th class="px-6 py-4">Recipient / Details</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700/50 text-slate-300 text-sm">
+            {{range .Notifications}}
+            <tr class="hover:bg-slate-700/20 transition-colors duration-150">
+                <td class="px-6 py-4 font-medium text-white">{{.Name}}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm shadow-purple-900/20">
+                        {{.Type}}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-slate-400 font-mono text-xs truncate max-w-xs block">
+                        {{if eq .Type "TELEGRAM"}}Chat ID: <span class="text-slate-300">{{index .Config "chat_id"}}</span>{{end}}
+                        {{if eq .Type "EMAIL"}}To: <span class="text-slate-300">{{index .Config "to_email"}}</span>{{end}}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <div class="flex justify-end items-center gap-4">
+                        <a href="/notifications/{{.ID}}/edit" class="text-blue-400 hover:text-blue-300 font-medium transition-colors text-sm">Edit</a>
+                        <form action="/api/notifications/{{.ID}}/delete" method="POST" class="inline" onsubmit="return confirm('Delete this notification channel?');">
+                            <button type="submit" class="text-slate-500 hover:text-red-400 transition-colors text-sm font-medium">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="4" class="px-6 py-16 text-center text-slate-500">
+                    <div class="flex flex-col items-center justify-center">
+                        <svg class="w-12 h-12 text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <p class="font-medium text-slate-400">No channels configured</p>
+                        <p class="text-xs mt-1">Add a notification channel to receive alerts.</p>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}

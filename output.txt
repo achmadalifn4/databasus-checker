@@ -1,0 +1,2584 @@
+=== PATH: ./web/templates/dashboard_layout.html ===
+{{define "dashboard_layout"}}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databasus Checker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        slate: { 800: '#1e293b', 850: '#172033', 900: '#0f172a' } // Added slate-850 for subtle contrast
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-300 font-sans antialiased flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-800 border-r border-slate-700/50 flex flex-col flex-shrink-0 shadow-xl z-20">
+        <div class="h-16 flex items-center px-6 border-b border-slate-700/50">
+            <span class="text-lg font-bold text-slate-50 tracking-tight flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center text-xs text-white">DB</div>
+                Databasus <span class="text-blue-500">Checker</span>
+            </span>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+            {{$active := .activeMenu}}
+            
+            <a href="/" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "dashboard"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+
+            <div class="pt-6 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Operations</div>
+            
+            <a href="/tests" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "tests"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Tests
+            </a>
+            <a href="/queue" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "queue"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Queue
+            </a>
+
+            <div class="pt-6 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Configuration</div>
+            
+            <a href="/storage" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "storage"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                Storage
+            </a>
+            <a href="/notifications" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "notifications"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                Notifications
+            </a>
+            <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "settings"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Settings
+            </a>
+        </nav>
+
+        <div class="border-t border-slate-700/50 p-4">
+            <a href="/logout" class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-red-400 bg-slate-700/30 rounded-lg hover:bg-red-500/10 hover:text-red-300 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Sign Out
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-900 relative">
+        <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-slate-900 to-transparent pointer-events-none z-10"></div>
+        
+        <div class="flex-1 overflow-auto p-8 lg:p-10">
+            <div class="max-w-5xl mx-auto">
+                {{template "content" .}}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+{{end}}-e 
+
+=== PATH: ./web/templates/layout.html ===
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{template "title" .}} - Databasus Checker</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        slate: { 800: '#1e293b', 850: '#172033', 900: '#0f172a' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-300 font-sans antialiased min-h-screen flex items-center justify-center relative overflow-hidden">
+    
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-4xl bg-blue-500/5 blur-[120px] pointer-events-none rounded-full"></div>
+
+    <div class="w-full max-w-md p-6 relative z-10">
+        <div class="mb-8 text-center">
+            <div class="inline-flex items-center justify-center gap-3 mb-4">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/30">
+                    DB
+                </div>
+            </div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">Databasus <span class="text-blue-500">Checker</span></h1>
+            <p class="text-slate-400 mt-2 text-sm">{{template "subtitle" .}}</p>
+        </div>
+
+        <div class="bg-slate-800 border border-slate-700/70 rounded-2xl shadow-2xl shadow-slate-950/50 overflow-hidden p-8 backdrop-blur-sm">
+            {{template "content" .}}
+        </div>
+        
+        <div class="mt-8 text-center">
+            <p class="text-slate-500 text-xs">
+                &copy; 2026 Databasus Checker. <br>
+                Secure Backup Verification System.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+{{end}}-e 
+
+=== PATH: ./web/templates/tests_form.html ===
+{{define "content"}}
+<div class="mb-8 border-b border-slate-700 pb-6">
+    <h1 class="text-2xl font-bold text-white tracking-tight">Create New Test</h1>
+    <p class="text-slate-400 mt-1 text-sm">Configure automated restore testing for a database.</p>
+</div>
+
+{{if .Error}}
+<div class="bg-red-900/20 border border-red-500/20 text-red-300 px-4 py-3 rounded-lg mb-6 flex items-center gap-3 text-sm">
+    <svg class="w-5 h-5 flex-shrink-0 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <span>{{.Error}}</span>
+</div>
+{{end}}
+
+<form action="/api/tests" method="POST" class="max-w-4xl space-y-8">
+    
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
+            Target Database
+        </h3>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Configuration Name</label>
+                <input type="text" name="name" required placeholder="e.g. Daily Production Restore"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Workspace</label>
+                    <div class="relative">
+                        <select id="workspaceSelect" name="workspace_id" required onchange="fetchDatabases()"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                            <option value="" disabled selected>Select a workspace</option>
+                            {{range .Workspaces}}
+                            <option value="{{.ID}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Database</label>
+                    <div class="relative">
+                        <select id="databaseSelect" name="database_id" required disabled
+                            class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                            <option value="">Select workspace first</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                    <input type="hidden" name="database_name" id="databaseNameInput">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">2</span>
+            Action on Success
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Upload Valid Backup To</label>
+                <div class="relative">
+                    <select name="storage_id"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                        <option value="0">-- Do Not Upload --</option>
+                        {{range .Storages}}
+                        <option value="{{.ID}}">{{.Name}} ({{.Type}})</option>
+                        {{end}}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5">Backup will be renamed and uploaded only if validation passes.</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Send Notification To</label>
+                <div class="relative">
+                    <select name="notification_id"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                        <option value="0">-- No Notification --</option>
+                        {{range .Notifications}}
+                        <option value="{{.ID}}">{{.Name}} ({{.Type}})</option>
+                        {{end}}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">3</span>
+            SQL Hooks
+        </h3>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label>
+                <textarea name="pre_restore_script" rows="3" placeholder="-- e.g. DROP SCHEMA public CASCADE;"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed"></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label>
+                <textarea name="post_restore_script" rows="3" placeholder="-- e.g. SELECT count(*) FROM users;"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end items-center gap-4 pt-4">
+        <a href="/tests" class="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform active:scale-95 text-sm">
+            Create Configuration
+        </button>
+    </div>
+</form>
+
+<script>
+async function fetchDatabases() {
+    const workspaceId = document.getElementById('workspaceSelect').value;
+    const dbSelect = document.getElementById('databaseSelect');
+    
+    dbSelect.disabled = true;
+    dbSelect.innerHTML = '<option>Loading databases...</option>';
+
+    try {
+        const response = await fetch(`/api/proxy/databases?workspace_id=${workspaceId}`);
+        if (!response.ok) throw new Error('API Error');
+        
+        const databases = await response.json();
+
+        dbSelect.innerHTML = '<option value="" disabled selected>Select a database</option>';
+        databases.forEach(db => {
+            const option = document.createElement('option');
+            option.value = db.id;
+            option.textContent = db.name;
+            option.dataset.name = db.name;
+            dbSelect.appendChild(option);
+        });
+        dbSelect.disabled = false;
+    } catch (error) {
+        dbSelect.innerHTML = '<option>Error fetching databases</option>';
+        console.error(error);
+        alert('Failed to connect to Databasus API. Check your Settings credentials.');
+    }
+}
+
+document.getElementById('databaseSelect').addEventListener('change', function() {
+    const selectedOption = this.options[this.selectedIndex];
+    document.getElementById('databaseNameInput').value = selectedOption.dataset.name;
+});
+</script>
+{{end}}-e 
+
+=== PATH: ./web/templates/tests_list.html ===
+{{define "content"}}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Restore Tests</h1>
+        <p class="text-slate-400 mt-1 text-sm">Manage automated restore verification tasks.</p>
+    </div>
+    <a href="/tests/create" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Create Test
+    </a>
+</div>
+
+<div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-sm">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-850/50 border-b border-slate-700 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+                <th class="px-6 py-4">Configuration Name</th>
+                <th class="px-6 py-4">Target Database</th>
+                <th class="px-6 py-4">Last Processed ID</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700/50 text-slate-300 text-sm">
+            {{range .Tests}}
+            <tr class="hover:bg-slate-700/20 transition-colors duration-150">
+                <td class="px-6 py-4 font-medium text-white">{{.Name}}</td>
+                <td class="px-6 py-4">
+                    <div class="flex flex-col">
+                        <span class="text-slate-200 font-medium">{{.DatabasusDatabaseName}}</span>
+                        <span class="text-xs text-slate-500 font-mono mt-0.5">{{.DatabasusDatabaseID}}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    {{if .LastProcessedBackupID}}
+                        <span class="inline-flex items-center px-2 py-1 rounded bg-slate-700/50 text-slate-400 font-mono text-xs">{{.LastProcessedBackupID}}</span>
+                    {{else}}
+                        <span class="text-slate-600 italic">Never run</span>
+                    {{end}}
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <div class="flex justify-end items-center gap-4">
+                        <a href="/tests/{{.ID}}/edit" class="text-blue-400 hover:text-blue-300 font-medium transition-colors">Edit</a>
+                        <form action="/api/tests/{{.ID}}/delete" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this configuration?');">
+                            <button type="submit" class="text-slate-500 hover:text-red-400 transition-colors">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="4" class="px-6 py-16 text-center text-slate-500">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-16 h-16 bg-slate-700/30 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <p class="font-medium text-slate-400">No test configurations found</p>
+                        <p class="text-xs mt-1">Create your first restore test to get started.</p>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}-e 
+
+=== PATH: ./web/templates/dashboard_index.html ===
+{{define "content"}}
+<div class="mb-8">
+    <h1 class="text-2xl font-bold text-white">Dashboard</h1>
+    <p class="text-slate-400">System overview and logs.</p>
+</div>
+
+<div class="grid grid-cols-3 gap-6 mb-8">
+    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+        <h3 class="text-slate-400 text-sm">Status</h3>
+        <p class="text-2xl font-bold text-green-500 mt-1">Operational</p>
+    </div>
+</div>
+{{end}}-e 
+
+=== PATH: ./web/templates/storage_list.html ===
+{{define "content"}}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Storage Configurations</h1>
+        <p class="text-slate-400 mt-1 text-sm">Manage external destinations for your backup uploads.</p>
+    </div>
+    <a href="/storage/create" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Add Storage
+    </a>
+</div>
+
+<div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-sm">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-850/50 border-b border-slate-700 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+                <th class="px-6 py-4">Name</th>
+                <th class="px-6 py-4">Type</th>
+                <th class="px-6 py-4">Details</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700/50 text-slate-300 text-sm">
+            {{range .Storages}}
+            <tr class="hover:bg-slate-700/20 transition-colors duration-150">
+                <td class="px-6 py-4 font-medium text-white">{{.Name}}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-sm shadow-blue-900/20">
+                        {{.Type}}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-slate-400 font-mono text-xs truncate max-w-xs block">
+                        {{if eq .Type "S3"}}Bucket: <span class="text-slate-300">{{index .Config "bucket"}}</span>{{end}}
+                        {{if eq .Type "NAS"}}Host: <span class="text-slate-300">{{index .Config "host"}}</span>{{end}}
+                        {{if eq .Type "FTP"}}Host: <span class="text-slate-300">{{index .Config "host"}}</span>{{end}}
+                        {{if eq .Type "SFTP"}}Host: <span class="text-slate-300">{{index .Config "host"}}</span>{{end}}
+                        {{if eq .Type "RCLONE"}}Custom Config{{end}}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <form action="/api/storage/{{.ID}}/delete" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this storage configuration?');">
+                        <button type="submit" class="text-slate-500 hover:text-red-400 transition-colors text-sm font-medium">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="4" class="px-6 py-16 text-center text-slate-500">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="w-16 h-16 bg-slate-700/30 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        </div>
+                        <p class="font-medium text-slate-400">No storage configured</p>
+                        <p class="text-xs mt-1">Add a storage destination to start uploading backups.</p>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}-e 
+
+=== PATH: ./web/templates/settings.html ===
+{{define "content"}}
+<div class="mb-8 border-b border-slate-700 pb-6">
+    <h1 class="text-2xl font-bold text-white tracking-tight">System Settings</h1>
+    <p class="text-slate-400 mt-1 text-sm">Configure Databasus connection and application preferences.</p>
+</div>
+
+<form action="/api/settings" method="POST" class="max-w-3xl space-y-8">
+    
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
+            Databasus Connection
+        </h3>
+        
+        <div class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Databasus URL</label>
+                <input type="text" name="databasus_url" value="{{.Settings.DatabasusURL}}" required
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-600 transition-all">
+                <p class="text-xs text-slate-500 mt-1.5">e.g. http://host.docker.internal:4005</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Username</label>
+                    <input type="email" name="databasus_user" value="{{.Settings.DatabasusUser}}" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+                    <input type="password" name="databasus_password" value="{{.Settings.DatabasusPassword}}" required
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">2</span>
+            Regional & Retention
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">App Timezone</label>
+                <div class="relative">
+                    <select name="app_timezone" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="Asia/Jakarta" {{if eq .Settings.AppTimezone "Asia/Jakarta"}}selected{{end}}>Asia/Jakarta (WIB)</option>
+                        <option value="Asia/Makassar" {{if eq .Settings.AppTimezone "Asia/Makassar"}}selected{{end}}>Asia/Makassar (WITA)</option>
+                        <option value="Asia/Jayapura" {{if eq .Settings.AppTimezone "Asia/Jayapura"}}selected{{end}}>Asia/Jayapura (WIT)</option>
+                        <option value="UTC" {{if eq .Settings.AppTimezone "UTC"}}selected{{end}}>UTC</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Databasus API Timezone</label>
+                <div class="relative">
+                    <select name="databasus_timezone" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="UTC" {{if eq .Settings.DatabasusTimezone "UTC"}}selected{{end}}>UTC (Default)</option>
+                        <option value="Asia/Jakarta" {{if eq .Settings.DatabasusTimezone "Asia/Jakarta"}}selected{{end}}>Asia/Jakarta</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:col-span-2">
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Log Retention</label>
+                <div class="flex items-center gap-3">
+                    <input type="number" name="log_retention_days" value="{{.Settings.LogRetentionDays}}" min="1" max="365"
+                        class="w-32 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                    <span class="text-sm text-slate-400">Days</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5">Automatically delete test logs older than this period.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end pt-4">
+        <button type="submit" 
+            class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-8 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform active:scale-95 flex items-center gap-2 text-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            Save Configuration
+        </button>
+    </div>
+</form>
+{{end}}-e 
+
+=== PATH: ./web/templates/install.html ===
+{{define "title"}}Installation Wizard{{end}}
+{{define "subtitle"}}Setup your initial administrator account{{end}}
+
+{{define "content"}}
+<div class="mb-6 bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex gap-3">
+    <svg class="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <p class="text-xs text-blue-200 leading-relaxed">
+        Welcome! Since this is your first time running Databasus Checker, please create an admin account to secure your dashboard.
+    </p>
+</div>
+
+<form action="/api/install" method="POST" class="space-y-5">
+    <div>
+        <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Admin Email</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
+            </div>
+            <input type="email" id="email" name="email" required placeholder="admin@company.com"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm">
+        </div>
+    </div>
+
+    <div>
+        <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Master Password</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <input type="password" id="password" name="password" required placeholder="••••••••" minlength="8"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm">
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">Minimum 8 characters required.</p>
+    </div>
+
+    <button type="submit" 
+        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 mt-2">
+        Complete Installation
+    </button>
+</form>
+{{end}}-e 
+
+=== PATH: ./web/templates/notification_form.html ===
+{{define "content"}}
+<div class="mb-8 border-b border-slate-700 pb-6">
+    <h1 class="text-2xl font-bold text-white tracking-tight">Add Notification Channel</h1>
+    <p class="text-slate-400 mt-1 text-sm">Configure where alerts should be sent.</p>
+</div>
+
+<form action="/api/notifications" method="POST" class="max-w-4xl space-y-8">
+    
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
+            Channel Info
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Channel Name</label>
+                <input type="text" name="name" required placeholder="e.g. DevOps Team Telegram"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Channel Type</label>
+                <div class="relative">
+                    <select id="notifType" name="type" required onchange="toggleNotifForm()"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="TELEGRAM">Telegram</option>
+                        <option value="EMAIL">Email (SMTP)</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="configContainer" class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm hidden">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">2</span>
+            Configuration Details
+        </h3>
+        
+        <div id="form-TELEGRAM" class="notif-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Bot Token*</label>
+                    <input type="text" name="telegram_token" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Chat ID*</label>
+                    <input type="text" name="telegram_chat_id" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+            </div>
+        </div>
+
+        <div id="form-EMAIL" class="notif-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">SMTP Host*</label>
+                    <input type="text" name="email_host" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">SMTP Port*</label>
+                    <input type="number" name="email_port" value="587" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Sender Email (From)*</label>
+                    <input type="email" name="email_from" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Recipient Email (To)*</label>
+                    <input type="email" name="email_to" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">SMTP Username (Optional)</label>
+                    <input type="text" name="email_user" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">SMTP Password (Optional)</label>
+                    <input type="password" name="email_password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="flex justify-between items-center pt-6 border-t border-slate-700/50">
+        <button type="button" onclick="testNotification()" id="testBtn"
+            class="px-5 py-2.5 rounded-lg border border-slate-600 text-slate-300 font-medium text-sm hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-all flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+            <span>Test Channel</span>
+        </button>
+
+        <div class="flex items-center gap-3">
+            <a href="/notifications" class="px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all text-sm transform active:scale-95">
+                Save Channel
+            </button>
+        </div>
+    </div>
+</form>
+
+<script>
+function toggleNotifForm() {
+    const type = document.getElementById('notifType').value;
+    const container = document.getElementById('configContainer');
+    const forms = document.querySelectorAll('.notif-form');
+    
+    forms.forEach(f => f.classList.add('hidden'));
+    
+    if (type) {
+        container.classList.remove('hidden');
+        const activeForm = document.getElementById('form-' + type);
+        if (activeForm) activeForm.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+async function testNotification() {
+    const btn = document.getElementById('testBtn');
+    const originalText = btn.innerHTML;
+    const form = document.querySelector('form');
+    
+    const type = document.getElementById('notifType').value;
+    if (!type) {
+        alert("Please select a Channel Type first.");
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = `<span class="opacity-75">Sending...</span>`;
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+    try {
+        const formData = new FormData(form);
+        const response = await fetch('/api/notifications/test-connection', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("Success: " + result.message);
+        } else {
+            alert("Notification Failed: " + result.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Network Error");
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+    }
+}
+</script>
+{{end}}-e 
+
+=== PATH: ./web/templates/storage_form.html ===
+{{define "content"}}
+<div class="mb-8 border-b border-slate-700 pb-6">
+    <h1 class="text-2xl font-bold text-white tracking-tight">Add Storage</h1>
+    <p class="text-slate-400 mt-1 text-sm">Configure a new destination for backup uploads.</p>
+</div>
+
+<form action="/api/storage" method="POST" class="max-w-4xl space-y-8">
+    
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
+            Basic Information
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Storage Name</label>
+                <input type="text" name="name" required placeholder="e.g. AWS S3 Production"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Storage Type</label>
+                <div class="relative">
+                    <select id="storageType" name="type" required onchange="toggleForm()"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="S3">S3 / S3 Compatible</option>
+                        <option value="NAS">NAS (SMB/CIFS)</option>
+                        <option value="FTP">FTP</option>
+                        <option value="SFTP">SFTP (SSH)</option>
+                        <option value="RCLONE">Rclone Config</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="configContainer" class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm hidden">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">2</span>
+            Connection Details
+        </h3>
+        
+        <div id="form-S3" class="storage-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Bucket Name*</label>
+                    <input type="text" name="s3_bucket" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Region*</label>
+                    <input type="text" name="s3_region" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="us-east-1">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Access Key*</label>
+                    <input type="text" name="s3_access_key" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Secret Key*</label>
+                    <input type="password" name="s3_secret_key" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1.5">Endpoint (Optional)</label>
+                    <input type="text" name="s3_endpoint" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Leave empty for AWS S3">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1.5">Folder Prefix (Optional)</label>
+                    <input type="text" name="s3_prefix" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="backups/">
+                </div>
+                <div class="flex items-center gap-3 pt-2">
+                    <input type="checkbox" name="s3_virtual_host" class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    <label class="text-sm text-slate-300">Use Virtual-Hosted-Style URLs</label>
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" name="s3_skip_tls" class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    <label class="text-sm text-slate-300">Skip TLS Verify (Insecure)</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="form-NAS" class="storage-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Host*</label>
+                    <input type="text" name="nas_host" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Port*</label>
+                    <input type="number" name="nas_port" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value="445">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Shared Folder*</label>
+                    <input type="text" name="nas_share" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Path (Optional)</label>
+                    <input type="text" name="nas_path" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Username*</label>
+                    <input type="text" name="nas_user" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Password*</label>
+                    <input type="password" name="nas_password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Domain (Optional)</label>
+                    <input type="text" name="nas_domain" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div class="flex items-center gap-3 mt-6">
+                    <input type="checkbox" name="nas_ssl" class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    <label class="text-sm text-slate-300">Use SSL/TLS</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="form-FTP" class="storage-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Host*</label>
+                    <input type="text" name="ftp_host" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Port*</label>
+                    <input type="number" name="ftp_port" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value="21">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Username*</label>
+                    <input type="text" name="ftp_user" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Password*</label>
+                    <input type="password" name="ftp_password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1.5">Remote Path (Optional)</label>
+                    <input type="text" name="ftp_path" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="/backups">
+                </div>
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" name="ftp_ssl" class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    <label class="text-sm text-slate-300">Use Explicit TLS (FTPS)</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="form-SFTP" class="storage-form hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Host*</label>
+                    <input type="text" name="sftp_host" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Port*</label>
+                    <input type="number" name="sftp_port" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" value="22">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Username*</label>
+                    <input type="text" name="sftp_user" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Auth Method</label>
+                    <div class="relative">
+                        <select id="sftpAuthMethod" name="sftp_auth_method" onchange="toggleSftpAuth()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                            <option value="password">Password</option>
+                            <option value="key">Private Key</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="sftp-password-field" class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1.5">Password*</label>
+                    <input type="password" name="sftp_password" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                
+                <div id="sftp-key-field" class="md:col-span-2 hidden">
+                    <label class="block text-sm text-slate-400 mb-1.5">Private Key (PEM Format)*</label>
+                    <textarea name="sftp_private_key" rows="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-xs leading-relaxed"></textarea>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm text-slate-400 mb-1.5">Remote Path (Optional)</label>
+                    <input type="text" name="sftp_path" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="/home/user/backups">
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" name="sftp_skip_host_key" class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                    <label class="text-sm text-slate-300">Skip Host Key Verification (Insecure)</label>
+                </div>
+            </div>
+        </div>
+
+        <div id="form-RCLONE" class="storage-form hidden space-y-6">
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Rclone Config Content*</label>
+                    <textarea name="rclone_config" rows="8" placeholder="[my-remote] type = drive ..."
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-xs leading-relaxed"></textarea>
+                    <p class="text-xs text-slate-500 mt-1.5">Paste content from 'rclone config file'. Supports Google Drive, OneDrive, Dropbox, etc.</p>
+                </div>
+                <div>
+                    <label class="block text-sm text-slate-400 mb-1.5">Remote Path (Optional)</label>
+                    <input type="text" name="rclone_path" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="my-remote:/backups">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="flex justify-between items-center pt-6 border-t border-slate-700/50">
+        <button type="button" onclick="testConnection()" id="testBtn"
+            class="px-5 py-2.5 rounded-lg border border-slate-600 text-slate-300 font-medium text-sm hover:bg-slate-700 hover:text-white hover:border-slate-500 transition-all flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <span>Test Connection</span>
+        </button>
+
+        <div class="flex items-center gap-3">
+            <a href="/storage" class="px-5 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
+            <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all text-sm transform active:scale-95">
+                Save Storage
+            </button>
+        </div>
+    </div>
+</form>
+
+<style>
+    .animate-spin { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+</style>
+
+<script>
+function toggleForm() {
+    const type = document.getElementById('storageType').value;
+    const container = document.getElementById('configContainer');
+    const forms = document.querySelectorAll('.storage-form');
+    
+    forms.forEach(f => f.classList.add('hidden'));
+    
+    if (type) {
+        container.classList.remove('hidden');
+        const activeForm = document.getElementById('form-' + type);
+        if (activeForm) activeForm.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+function toggleSftpAuth() {
+    const method = document.getElementById('sftpAuthMethod').value;
+    const passField = document.getElementById('sftp-password-field');
+    const keyField = document.getElementById('sftp-key-field');
+
+    if (method === 'password') {
+        passField.classList.remove('hidden');
+        keyField.classList.add('hidden');
+    } else {
+        passField.classList.add('hidden');
+        keyField.classList.remove('hidden');
+    }
+}
+
+async function testConnection() {
+    const btn = document.getElementById('testBtn');
+    const originalText = 'Test Connection'; 
+    const form = document.querySelector('form');
+    
+    const type = document.getElementById('storageType').value;
+    if (!type) {
+        alert("Please select a Storage Type first.");
+        return;
+    }
+
+    // Loading State
+    btn.disabled = true;
+    btn.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Testing...`;
+    btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+    try {
+        const formData = new FormData(form);
+        const response = await fetch('/api/storage/test-connection', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert("Connection successful! " + result.message);
+        } else {
+            alert("Connection Failed:\n" + result.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Network Error or Server Error");
+    } finally {
+        // Reset State
+        btn.disabled = false;
+        btn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> <span>Test Connection</span>`;
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+    }
+}
+</script>
+{{end}}-e 
+
+=== PATH: ./web/templates/notification_list.html ===
+{{define "content"}}
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-white tracking-tight">Notification Channels</h1>
+        <p class="text-slate-400 mt-1 text-sm">Manage alerts for backup restoration status.</p>
+    </div>
+    <a href="/notifications/create" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-5 rounded-lg flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        Add Channel
+    </a>
+</div>
+
+<div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-sm">
+    <table class="w-full text-left border-collapse">
+        <thead>
+            <tr class="bg-slate-850/50 border-b border-slate-700 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+                <th class="px-6 py-4">Name</th>
+                <th class="px-6 py-4">Type</th>
+                <th class="px-6 py-4">Recipient / Details</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-700/50 text-slate-300 text-sm">
+            {{range .Notifications}}
+            <tr class="hover:bg-slate-700/20 transition-colors duration-150">
+                <td class="px-6 py-4 font-medium text-white">{{.Name}}</td>
+                <td class="px-6 py-4">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-sm shadow-purple-900/20">
+                        {{.Type}}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="text-slate-400 font-mono text-xs truncate max-w-xs block">
+                        {{if eq .Type "TELEGRAM"}}Chat ID: <span class="text-slate-300">{{index .Config "chat_id"}}</span>{{end}}
+                        {{if eq .Type "EMAIL"}}To: <span class="text-slate-300">{{index .Config "to_email"}}</span>{{end}}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <form action="/api/notifications/{{.ID}}/delete" method="POST" class="inline" onsubmit="return confirm('Delete this notification channel?');">
+                        <button type="submit" class="text-slate-500 hover:text-red-400 transition-colors text-sm font-medium">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="4" class="px-6 py-16 text-center text-slate-500">
+                    <div class="flex flex-col items-center justify-center">
+                        <svg class="w-12 h-12 text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <p class="font-medium text-slate-400">No channels configured</p>
+                        <p class="text-xs mt-1">Add a notification channel to receive alerts.</p>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+</div>
+{{end}}-e 
+
+=== PATH: ./web/templates/login.html ===
+{{define "title"}}Login{{end}}
+{{define "subtitle"}}Sign in to access your dashboard{{end}}
+
+{{define "content"}}
+<form action="/api/login" method="POST" class="space-y-5">
+    <div>
+        <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Email Address</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
+            </div>
+            <input type="email" id="email" name="email" required placeholder="admin@example.com"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm">
+        </div>
+    </div>
+
+    <div>
+        <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Password</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <input type="password" id="password" name="password" required placeholder="••••••••"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm">
+        </div>
+    </div>
+
+    <button type="submit" 
+        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 flex justify-center items-center gap-2 mt-2">
+        <span>Sign In</span>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+    </button>
+</form>
+{{end}}-e 
+
+=== PATH: ./web/templates/tests_edit.html ===
+{{define "content"}}
+<div class="mb-8 border-b border-slate-700 pb-6">
+    <h1 class="text-2xl font-bold text-white tracking-tight">Edit Configuration</h1>
+    <p class="text-slate-400 mt-1 text-sm">Update settings for <strong>{{.Test.Name}}</strong>.</p>
+</div>
+
+<form action="/api/tests/{{.Test.ID}}/update" method="POST" class="max-w-4xl space-y-8">
+    
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs">1</span>
+            General Info
+        </h3>
+
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Configuration Name</label>
+                <input type="text" name="name" required value="{{.Test.Name}}"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="opacity-70">
+                    <label class="block text-sm font-medium text-slate-500 mb-1.5">Target Database <span class="text-xs text-slate-600">(Locked)</span></label>
+                    <input type="text" disabled value="{{.Test.DatabasusDatabaseName}}"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm cursor-not-allowed">
+                </div>
+                <div class="opacity-70">
+                    <label class="block text-sm font-medium text-slate-500 mb-1.5">Database ID <span class="text-xs text-slate-600">(Locked)</span></label>
+                    <input type="text" disabled value="{{.Test.DatabasusDatabaseID}}"
+                        class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2.5 text-slate-400 text-sm font-mono cursor-not-allowed">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center text-xs">2</span>
+            Action on Success
+        </h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Upload Valid Backup To</label>
+                <div class="relative">
+                    <select name="storage_id"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                        <option value="0">-- Do Not Upload --</option>
+                        
+                        {{/* Simpan pointer ID saat ini ke variabel */}}
+                        {{$currentStorage := .Test.StorageID}}
+                        
+                        {{range .Storages}}
+                        {{/* Cek: jika $currentStorage TIDAK nil DAN ID-nya sama dengan .ID, maka 'selected' */}}
+                        <option value="{{.ID}}" {{if and $currentStorage (eq .ID *$currentStorage)}}selected{{end}}>
+                            {{.Name}} ({{.Type}})
+                        </option>
+                        {{end}}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5">Backup will be renamed and uploaded only if validation passes.</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Send Notification To</label>
+                <div class="relative">
+                    <select name="notification_id"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white text-sm appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all">
+                        <option value="0">-- No Notification --</option>
+                        
+                        {{/* Simpan pointer ID saat ini ke variabel */}}
+                        {{$currentNotif := .Test.NotificationID}}
+                        
+                        {{range .Notifications}}
+                        {{/* Cek: jika $currentNotif TIDAK nil DAN ID-nya sama dengan .ID, maka 'selected' */}}
+                        <option value="{{.ID}}" {{if and $currentNotif (eq .ID *$currentNotif)}}selected{{end}}>
+                            {{.Name}} ({{.Type}})
+                        </option>
+                        {{end}}
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 shadow-sm">
+        <h3 class="text-base font-semibold text-white mb-6 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs">3</span>
+            SQL Hooks
+        </h3>
+        
+        <div class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Pre-Restore Script</label>
+                <textarea name="pre_restore_script" rows="3" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed">{{.Test.PreRestoreScript}}</textarea>
+                <p class="text-xs text-slate-500 mt-1.5">Executed before the .dump file is restored.</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1.5">Post-Restore Script</label>
+                <textarea name="post_restore_script" rows="3"
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent leading-relaxed">{{.Test.PostRestoreScript}}</textarea>
+                <p class="text-xs text-slate-500 mt-1.5">Executed after restore. Use for validation.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex justify-end items-center gap-4 pt-4">
+        <a href="/tests" class="px-6 py-2.5 text-sm font-medium text-slate-400 hover:text-white transition-colors">Cancel</a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg shadow-blue-500/20 transition-all transform active:scale-95 text-sm">
+            Save Changes
+        </button>
+    </div>
+</form>
+{{end}}-e 
+
+=== PATH: ./cmd/server/main.go ===
+package main
+
+import (
+	"databasus-checker/internal/database"
+	"databasus-checker/internal/middleware"
+	"databasus-checker/internal/models"
+	"databasus-checker/internal/services"
+	"databasus-checker/internal/utils"
+	"flag"
+	"html/template"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/labstack/echo/v4"
+	"golang.org/x/crypto/bcrypt"
+)
+
+type TemplateRenderer struct {
+	templatesDir string
+}
+
+func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	layout := filepath.Join(t.templatesDir, "layout.html")
+	view := filepath.Join(t.templatesDir, name)
+	tmpl, err := template.ParseFiles(layout, view)
+	if err != nil {
+		return err
+	}
+	return tmpl.ExecuteTemplate(w, "base", data)
+}
+
+func (t *TemplateRenderer) RenderDashboard(w io.Writer, name string, data interface{}, activeMenu string) error {
+	layout := filepath.Join(t.templatesDir, "dashboard_layout.html")
+	view := filepath.Join(t.templatesDir, name)
+
+	tmpl, err := template.ParseFiles(layout, view)
+	if err != nil {
+		return err
+	}
+
+	dataMap := make(map[string]interface{})
+	if data != nil {
+		if m, ok := data.(echo.Map); ok {
+			for k, v := range m {
+				dataMap[k] = v
+			}
+		} else if m, ok := data.(map[string]interface{}); ok {
+			for k, v := range m {
+				dataMap[k] = v
+			}
+		}
+	}
+	dataMap["activeMenu"] = activeMenu
+	return tmpl.ExecuteTemplate(w, "dashboard_layout", dataMap)
+}
+
+func main() {
+	_ = godotenv.Load()
+
+	newPass := flag.String("new-password", "", "Set new password")
+	targetEmail := flag.String("email", "", "Email target")
+	flag.Parse()
+
+	database.Connect()
+
+	if *newPass != "" && *targetEmail != "" {
+		handlePasswordReset(*targetEmail, *newPass)
+		return
+	}
+
+	e := echo.New()
+	e.Renderer = &TemplateRenderer{templatesDir: "web/templates"}
+	middleware.Setup(e)
+
+	e.GET("/install", func(c echo.Context) error { return c.Render(http.StatusOK, "install.html", nil) })
+	e.GET("/login", func(c echo.Context) error { return c.Render(http.StatusOK, "login.html", nil) })
+
+	authService := services.AuthService{}
+
+	e.POST("/api/install", func(c echo.Context) error {
+		email := c.FormValue("email")
+		password := c.FormValue("password")
+		if err := authService.CreateFirstAdmin(email, password); err != nil {
+			return c.String(http.StatusBadRequest, err.Error())
+		}
+		return c.Redirect(http.StatusFound, "/login")
+	})
+
+	e.POST("/api/login", func(c echo.Context) error {
+		email := c.FormValue("email")
+		password := c.FormValue("password")
+		user, err := authService.Authenticate(email, password)
+		if err != nil {
+			return c.String(http.StatusUnauthorized, "Invalid Credentials")
+		}
+		token, _ := utils.GenerateToken(user.ID.String(), user.Role)
+		cookie := new(http.Cookie)
+		cookie.Name = "auth_token"
+		cookie.Value = token
+		cookie.Expires = time.Now().Add(24 * time.Hour)
+		cookie.HttpOnly = true
+		cookie.Path = "/"
+		c.SetCookie(cookie)
+		return c.Redirect(http.StatusFound, "/")
+	})
+
+	e.GET("/logout", func(c echo.Context) error {
+		cookie := new(http.Cookie)
+		cookie.Name = "auth_token"
+		cookie.Value = ""
+		cookie.Expires = time.Now().Add(-1 * time.Hour)
+		cookie.Path = "/"
+		c.SetCookie(cookie)
+		return c.Redirect(http.StatusFound, "/login")
+	})
+
+	// --- DASHBOARD ROUTES ---
+
+	e.GET("/", func(c echo.Context) error {
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "dashboard_index.html", nil, "dashboard")
+	})
+
+	e.GET("/settings", func(c echo.Context) error {
+		settings := models.GetSettings(database.DB)
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "settings.html", echo.Map{"Settings": settings}, "settings")
+	})
+
+	e.POST("/api/settings", func(c echo.Context) error {
+		settings := models.GetSettings(database.DB)
+		settings.DatabasusURL = c.FormValue("databasus_url")
+		settings.DatabasusUser = c.FormValue("databasus_user")
+		settings.DatabasusPassword = c.FormValue("databasus_password")
+		settings.AppTimezone = c.FormValue("app_timezone")
+		settings.DatabasusTimezone = c.FormValue("databasus_timezone")
+		retentionDays, _ := strconv.Atoi(c.FormValue("log_retention_days"))
+		if retentionDays > 0 {
+			settings.LogRetentionDays = retentionDays
+		}
+		database.DB.Save(&settings)
+		return c.Redirect(http.StatusFound, "/settings")
+	})
+
+	// ==========================================
+	// --- INTEGRASI TESTS MENU ---
+	// ==========================================
+
+	databasusClient := services.DatabasusClient{}
+
+	e.GET("/tests", func(c echo.Context) error {
+		var tests []models.RestoreTestConfig
+		database.DB.Order("created_at desc").Find(&tests)
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "tests_list.html", echo.Map{"Tests": tests}, "tests")
+	})
+
+	e.GET("/tests/create", func(c echo.Context) error {
+		// Fetch Workspaces (External)
+		workspaces, err := databasusClient.GetWorkspaces()
+		if err != nil {
+			return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "tests_form.html", echo.Map{"Error": "Could not fetch workspaces. Check settings."}, "tests")
+		}
+
+		// Fetch Local Storages & Notifications for Dropdown
+		var storages []models.StorageConfig
+		var notifications []models.NotificationConfig
+		database.DB.Find(&storages)
+		database.DB.Find(&notifications)
+
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "tests_form.html", echo.Map{
+			"Workspaces":    workspaces,
+			"Storages":      storages,
+			"Notifications": notifications,
+		}, "tests")
+	})
+
+	e.GET("/api/proxy/databases", func(c echo.Context) error {
+		workspaceID := c.QueryParam("workspace_id")
+		dbs, err := databasusClient.GetDatabases(workspaceID)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		}
+		return c.JSON(http.StatusOK, dbs)
+	})
+
+	e.POST("/api/tests", func(c echo.Context) error {
+		config := models.RestoreTestConfig{
+			Name:                  c.FormValue("name"),
+			WorkspaceID:           c.FormValue("workspace_id"),
+			DatabasusDatabaseID:   c.FormValue("database_id"),
+			DatabasusDatabaseName: c.FormValue("database_name"),
+			PreRestoreScript:      c.FormValue("pre_restore_script"),
+			PostRestoreScript:     c.FormValue("post_restore_script"),
+		}
+
+		// Parse IDs (Handle 0 or empty)
+		if sID, err := strconv.Atoi(c.FormValue("storage_id")); err == nil && sID > 0 {
+			uID := uint(sID)
+			config.StorageID = &uID
+		}
+		if nID, err := strconv.Atoi(c.FormValue("notification_id")); err == nil && nID > 0 {
+			uID := uint(nID)
+			config.NotificationID = &uID
+		}
+
+		if err := database.DB.Create(&config).Error; err != nil {
+			return c.String(http.StatusBadRequest, "Failed to save: "+err.Error())
+		}
+		return c.Redirect(http.StatusFound, "/tests")
+	})
+
+	e.POST("/api/tests/:id/delete", func(c echo.Context) error {
+		id := c.Param("id")
+		database.DB.Delete(&models.RestoreTestConfig{}, "id = ?", id)
+		return c.Redirect(http.StatusFound, "/tests")
+	})
+
+	e.GET("/tests/:id/edit", func(c echo.Context) error {
+		id := c.Param("id")
+		var test models.RestoreTestConfig
+		if err := database.DB.First(&test, "id = ?", id).Error; err != nil {
+			return c.Redirect(http.StatusFound, "/tests")
+		}
+
+		// Fetch Local Storages & Notifications for Dropdown
+		var storages []models.StorageConfig
+		var notifications []models.NotificationConfig
+		database.DB.Find(&storages)
+		database.DB.Find(&notifications)
+
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "tests_edit.html", echo.Map{
+			"Test":          test,
+			"Storages":      storages,
+			"Notifications": notifications,
+		}, "tests")
+	})
+
+	e.POST("/api/tests/:id/update", func(c echo.Context) error {
+		id := c.Param("id")
+		var test models.RestoreTestConfig
+		if err := database.DB.First(&test, "id = ?", id).Error; err != nil {
+			return c.String(http.StatusNotFound, "Test config not found")
+		}
+		test.Name = c.FormValue("name")
+		test.PreRestoreScript = c.FormValue("pre_restore_script")
+		test.PostRestoreScript = c.FormValue("post_restore_script")
+
+		// Update Storage & Notif IDs
+		if sID, err := strconv.Atoi(c.FormValue("storage_id")); err == nil && sID > 0 {
+			uID := uint(sID)
+			test.StorageID = &uID
+		} else {
+			test.StorageID = nil
+		}
+
+		if nID, err := strconv.Atoi(c.FormValue("notification_id")); err == nil && nID > 0 {
+			uID := uint(nID)
+			test.NotificationID = &uID
+		} else {
+			test.NotificationID = nil
+		}
+
+		database.DB.Save(&test)
+		return c.Redirect(http.StatusFound, "/tests")
+	})
+
+	// ==========================================
+	// --- INTEGRASI STORAGE MENU ---
+	// ==========================================
+
+	e.GET("/storage", func(c echo.Context) error {
+		var storages []models.StorageConfig
+		database.DB.Order("created_at desc").Find(&storages)
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "storage_list.html", echo.Map{"Storages": storages}, "storage")
+	})
+
+	e.GET("/storage/create", func(c echo.Context) error {
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "storage_form.html", nil, "storage")
+	})
+
+	parseStorageConfig := func(c echo.Context) (string, string, map[string]interface{}) {
+		storageType := c.FormValue("type")
+		name := c.FormValue("name")
+		configMap := make(map[string]interface{})
+		getBool := func(key string) bool { return c.FormValue(key) == "on" }
+
+		switch storageType {
+		case "S3":
+			configMap["bucket"] = c.FormValue("s3_bucket")
+			configMap["region"] = c.FormValue("s3_region")
+			configMap["access_key"] = c.FormValue("s3_access_key")
+			configMap["secret_key"] = c.FormValue("s3_secret_key")
+			configMap["endpoint"] = c.FormValue("s3_endpoint")
+			configMap["prefix"] = c.FormValue("s3_prefix")
+			configMap["virtual_host"] = getBool("s3_virtual_host")
+			configMap["skip_tls"] = getBool("s3_skip_tls")
+		case "NAS":
+			configMap["host"] = c.FormValue("nas_host")
+			configMap["port"] = c.FormValue("nas_port")
+			configMap["share"] = c.FormValue("nas_share")
+			configMap["path"] = c.FormValue("nas_path")
+			configMap["user"] = c.FormValue("nas_user")
+			configMap["password"] = c.FormValue("nas_password")
+			configMap["domain"] = c.FormValue("nas_domain")
+			configMap["ssl"] = getBool("nas_ssl")
+		case "FTP":
+			configMap["host"] = c.FormValue("ftp_host")
+			configMap["port"] = c.FormValue("ftp_port")
+			configMap["user"] = c.FormValue("ftp_user")
+			configMap["password"] = c.FormValue("ftp_password")
+			configMap["path"] = c.FormValue("ftp_path")
+			configMap["ssl"] = getBool("ftp_ssl")
+		case "SFTP":
+			configMap["host"] = c.FormValue("sftp_host")
+			configMap["port"] = c.FormValue("sftp_port")
+			configMap["user"] = c.FormValue("sftp_user")
+			configMap["path"] = c.FormValue("sftp_path")
+			configMap["auth_method"] = c.FormValue("sftp_auth_method")
+			configMap["password"] = c.FormValue("sftp_password")
+			configMap["private_key"] = c.FormValue("sftp_private_key")
+			configMap["skip_host_key"] = getBool("sftp_skip_host_key")
+		case "RCLONE":
+			configMap["config_content"] = c.FormValue("rclone_config")
+			configMap["remote_path"] = c.FormValue("rclone_path")
+		}
+		return storageType, name, configMap
+	}
+
+	e.POST("/api/storage", func(c echo.Context) error {
+		storageType, name, configMap := parseStorageConfig(c)
+		storage := models.StorageConfig{
+			Name:   name,
+			Type:   storageType,
+			Config: configMap,
+		}
+		if err := database.DB.Create(&storage).Error; err != nil {
+			return c.String(http.StatusBadRequest, "Failed to save storage: "+err.Error())
+		}
+		return c.Redirect(http.StatusFound, "/storage")
+	})
+
+	e.POST("/api/storage/:id/delete", func(c echo.Context) error {
+		id := c.Param("id")
+		database.DB.Delete(&models.StorageConfig{}, "id = ?", id)
+		return c.Redirect(http.StatusFound, "/storage")
+	})
+
+	e.POST("/api/storage/test-connection", func(c echo.Context) error {
+		workspaces, err := databasusClient.GetWorkspaces()
+		if err != nil || len(workspaces) == 0 {
+			return c.JSON(http.StatusBadRequest, map[string]string{
+				"message": "Failed to test connection: No active Workspace found. Check Settings.",
+			})
+		}
+		activeWorkspaceID := workspaces[0].ID
+
+		storageType, name, _ := parseStorageConfig(c)
+
+		payload := make(map[string]interface{})
+		payload["workspaceId"] = activeWorkspaceID
+		payload["type"] = storageType
+		payload["name"] = name + " (Test)"
+
+		getBool := func(key string) bool { return c.FormValue(key) == "on" }
+
+		switch storageType {
+		case "S3":
+			payload["s3Storage"] = map[string]interface{}{
+				"s3Bucket":                c.FormValue("s3_bucket"),
+				"s3Region":                c.FormValue("s3_region"),
+				"s3AccessKey":             c.FormValue("s3_access_key"),
+				"s3SecretKey":             c.FormValue("s3_secret_key"),
+				"s3Endpoint":              c.FormValue("s3_endpoint"),
+				"s3Prefix":                c.FormValue("s3_prefix"),
+				"s3UseVirtualHostedStyle": getBool("s3_virtual_host"),
+				"skipTLSVerify":           getBool("s3_skip_tls"),
+			}
+		case "NAS":
+			port, _ := strconv.Atoi(c.FormValue("nas_port"))
+			payload["nasStorage"] = map[string]interface{}{
+				"host":     c.FormValue("nas_host"),
+				"port":     port,
+				"share":    c.FormValue("nas_share"),
+				"path":     c.FormValue("nas_path"),
+				"username": c.FormValue("nas_user"),
+				"password": c.FormValue("nas_password"),
+				"domain":   c.FormValue("nas_domain"),
+				"useSsl":   getBool("nas_ssl"),
+			}
+		case "FTP":
+			port, _ := strconv.Atoi(c.FormValue("ftp_port"))
+			payload["ftpStorage"] = map[string]interface{}{
+				"host":     c.FormValue("ftp_host"),
+				"port":     port,
+				"username": c.FormValue("ftp_user"),
+				"password": c.FormValue("ftp_password"),
+				"path":     c.FormValue("ftp_path"),
+				"useSsl":   getBool("ftp_ssl"),
+			}
+		case "SFTP":
+			port, _ := strconv.Atoi(c.FormValue("sftp_port"))
+			payload["sftpStorage"] = map[string]interface{}{
+				"host":              c.FormValue("sftp_host"),
+				"port":              port,
+				"username":          c.FormValue("sftp_user"),
+				"path":              c.FormValue("sftp_path"),
+				"password":          c.FormValue("sftp_password"),
+				"privateKey":        c.FormValue("sftp_private_key"),
+				"skipHostKeyVerify": getBool("sftp_skip_host_key"),
+			}
+		case "RCLONE":
+			payload["rcloneStorage"] = map[string]interface{}{
+				"configContent": c.FormValue("rclone_config"),
+				"remotePath":    c.FormValue("rclone_path"),
+			}
+		}
+
+		if err := databasusClient.TestStorageConnection(payload); err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
+		}
+		return c.JSON(http.StatusOK, map[string]string{"message": "Connection successful!"})
+	})
+
+	// ==========================================
+	// --- INTEGRASI NOTIFICATIONS MENU ---
+	// ==========================================
+
+	e.GET("/notifications", func(c echo.Context) error {
+		var notifs []models.NotificationConfig
+		database.DB.Order("created_at desc").Find(&notifs)
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "notification_list.html", echo.Map{"Notifications": notifs}, "notifications")
+	})
+
+	e.GET("/notifications/create", func(c echo.Context) error {
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "notification_form.html", nil, "notifications")
+	})
+
+	parseNotifConfig := func(c echo.Context) (string, string, map[string]interface{}) {
+		notifType := c.FormValue("type")
+		name := c.FormValue("name")
+		configMap := make(map[string]interface{})
+
+		switch notifType {
+		case "TELEGRAM":
+			configMap["bot_token"] = c.FormValue("telegram_token")
+			configMap["chat_id"] = c.FormValue("telegram_chat_id")
+		case "EMAIL":
+			configMap["host"] = c.FormValue("email_host")
+			configMap["port"] = c.FormValue("email_port")
+			configMap["user"] = c.FormValue("email_user")
+			configMap["password"] = c.FormValue("email_password")
+			configMap["from_email"] = c.FormValue("email_from")
+			configMap["to_email"] = c.FormValue("email_to")
+		}
+		return notifType, name, configMap
+	}
+
+	e.POST("/api/notifications", func(c echo.Context) error {
+		notifType, name, configMap := parseNotifConfig(c)
+		notif := models.NotificationConfig{
+			Name:   name,
+			Type:   notifType,
+			Config: configMap,
+		}
+		if err := database.DB.Create(&notif).Error; err != nil {
+			return c.String(http.StatusBadRequest, "Failed to save notification: "+err.Error())
+		}
+		return c.Redirect(http.StatusFound, "/notifications")
+	})
+
+	e.POST("/api/notifications/:id/delete", func(c echo.Context) error {
+		id := c.Param("id")
+		database.DB.Delete(&models.NotificationConfig{}, "id = ?", id)
+		return c.Redirect(http.StatusFound, "/notifications")
+	})
+
+	// --- NATIVE NOTIFICATION TEST ---
+	e.POST("/api/notifications/test-connection", func(c echo.Context) error {
+		notifType, _, configMap := parseNotifConfig(c)
+
+		if notifType == "TELEGRAM" {
+			token := configMap["bot_token"].(string)
+			chatId := configMap["chat_id"].(string)
+
+			if err := utils.SendTelegram(token, chatId, "Databasus Checker: This is a test notification."); err != nil {
+				return c.JSON(http.StatusBadRequest, map[string]string{"message": "Telegram Error: " + err.Error()})
+			}
+		} else if notifType == "EMAIL" {
+			host := configMap["host"].(string)
+			portStr := configMap["port"].(string)
+			port, _ := strconv.Atoi(portStr)
+			user := configMap["user"].(string)
+			pass := configMap["password"].(string)
+			from := configMap["from_email"].(string)
+			to := configMap["to_email"].(string)
+
+			if err := utils.SendEmail(host, port, user, pass, from, to, "Databasus Checker Test", "This is a test notification from Databasus Checker."); err != nil {
+				return c.JSON(http.StatusBadRequest, map[string]string{"message": "Email Error: " + err.Error()})
+			}
+		} else {
+			return c.JSON(http.StatusBadRequest, map[string]string{"message": "Unsupported notification type"})
+		}
+
+		return c.JSON(http.StatusOK, map[string]string{"message": "Test notification sent successfully!"})
+	})
+
+	e.GET("/queue", func(c echo.Context) error { return c.String(http.StatusOK, "Coming Soon") })
+
+	serverPort := os.Getenv("APP_PORT")
+	if serverPort == "" {
+		serverPort = "4006"
+	}
+	e.Logger.Fatal(e.Start(":" + serverPort))
+}
+
+func handlePasswordReset(email, password string) {
+	var user models.User
+	result := database.DB.Where("email = ?", email).First(&user)
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	if result.Error != nil {
+		log.Printf("User %s not found. Creating new admin user...", email)
+		user = models.User{Email: email, Password: string(hashed), Role: "ADMIN"}
+		if err := database.DB.Create(&user).Error; err != nil {
+			log.Fatal("Failed to create user: ", err)
+		}
+	} else {
+		user.Password = string(hashed)
+		if err := database.DB.Save(&user).Error; err != nil {
+			log.Fatal("Failed to update password: ", err)
+		}
+	}
+	os.Exit(0)
+}
+-e 
+
+=== PATH: ./output.txt ===
+=== PATH: ./.env ===
+APP_PORT=4006
+DB_HOST=localhost
+DB_PORT=5433
+DB_USER=checkerdba
+DB_PASSWORD=checkerdbpass
+DB_NAME=checkerdb2
+BACKUP_PATH=/home/svm-2509-301/databasus/databasus-data/backups-e 
+
+=== PATH: ./Dockerfile ===
+# Build Stage
+FROM golang:1.25-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o binary cmd/server/main.go
+
+# Run Stage
+FROM alpine:latest
+WORKDIR /app
+RUN apk --no-cache add ca-certificates tzdata
+COPY --from=builder /app/binary .
+# Copy folder template nanti saat tahap frontend sudah jadi
+# COPY --from=builder /app/web ./web 
+
+CMD ["./binary"]-e 
+
+=== PATH: ./docker-compose.yml ===
+services:
+  # Main Application
+  databasus-checker:
+    container_name: databasus-checker
+    build: .
+    ports:
+      - "4006:4006"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Untuk spawn container restore
+      - /root/databasus/databasus-data/backups:/backups # Wajib sama dengan Databasus
+    environment:
+      - APP_PORT=4006
+      - DB_HOST=postgres-checker
+      - DB_PORT=5432
+      - DB_USER=checker
+      - DB_PASSWORD=checkerpass
+      - DB_NAME=checker_db
+      - BACKUP_PATH=/backups
+    depends_on:
+      - postgres-checker
+    restart: unless-stopped
+    # Penting: Gunakan network yang sama atau bridge agar bisa komunikasi antar container
+
+  # Internal DB for Databasus Checker State
+  postgres-checker:
+    image: postgres:15-alpine
+    container_name: postgres-checker
+    environment:
+      - POSTGRES_USER=checker
+      - POSTGRES_PASSWORD=checkerpass
+      - POSTGRES_DB=checker_db
+    volumes:
+      - checker_pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  checker_pg_data:
+-e 
+
+=== PATH: ./go.mod ===
+module databasus-checker
+
+go 1.24.0
+
+toolchain go1.24.12
+
+require (
+	github.com/golang-jwt/jwt/v5 v5.3.1
+	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
+	github.com/labstack/echo/v4 v4.15.0
+	golang.org/x/crypto v0.47.0
+	gorm.io/driver/postgres v1.6.0
+	gorm.io/gorm v1.31.1
+)
+
+require (
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
+	github.com/jackc/pgx/v5 v5.6.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/labstack/gommon v0.4.2 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/valyala/bytebufferpool v1.0.0 // indirect
+	github.com/valyala/fasttemplate v1.2.2 // indirect
+	golang.org/x/net v0.48.0 // indirect
+	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sys v0.40.0 // indirect
+	golang.org/x/text v0.33.0 // indirect
+)
+-e 
+
+=== PATH: ./internal/middleware/auth_middleware.go ===
+package middleware
+
+import (
+	"databasus-checker/internal/services"
+	"databasus-checker/internal/utils"
+	"net/http"
+	"strings"
+
+	"github.com/labstack/echo/v4"
+)
+
+func Setup(e *echo.Echo) {
+	authService := services.AuthService{}
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			path := c.Path()
+
+			// Bypass assets
+			if strings.HasPrefix(path, "/assets") {
+				return next(c)
+			}
+
+			// 1. Cek Fresh Install (Prioritas Utama)
+			if authService.IsFreshInstall() {
+				if path != "/install" && path != "/api/install" {
+					return c.Redirect(http.StatusFound, "/install")
+				}
+				return next(c)
+			}
+
+			// Blokir akses install jika sudah installed
+			if path == "/install" || path == "/api/install" {
+				return c.Redirect(http.StatusFound, "/login")
+			}
+
+			// 2. Proteksi Halaman Dashboard & API (Route Guard)
+			// Daftar route yang boleh diakses TANPA login
+			publicRoutes := map[string]bool{
+				"/login":     true,
+				"/api/login": true,
+			}
+
+			// Jika route TIDAK public, maka WAJIB cek Token
+			if !publicRoutes[path] {
+				cookie, err := c.Cookie("auth_token")
+				if err != nil {
+					return c.Redirect(http.StatusFound, "/login")
+				}
+
+				claims, err := utils.ValidateToken(cookie.Value)
+				if err != nil {
+					return c.Redirect(http.StatusFound, "/login")
+				}
+
+				// Simpan user info di context (siapa tau nanti butuh)
+				c.Set("user_id", claims.UserID)
+				c.Set("role", claims.Role)
+			}
+
+			// Jika user SUDAH login tapi buka halaman login, lempar ke dashboard
+			if path == "/login" {
+				if _, err := c.Cookie("auth_token"); err == nil {
+					return c.Redirect(http.StatusFound, "/")
+				}
+			}
+
+			return next(c)
+		}
+	})
+}
+-e 
+
+=== PATH: ./internal/services/auth_service.go ===
+package services
+
+import (
+	"databasus-checker/internal/database"
+	"databasus-checker/internal/models"
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+)
+
+type AuthService struct{}
+
+// Cek apakah sistem baru (belum ada user)
+func (s *AuthService) IsFreshInstall() bool {
+	var count int64
+	database.DB.Model(&models.User{}).Count(&count)
+	return count == 0
+}
+
+// Create admin pertama kali via Wizard
+func (s *AuthService) CreateFirstAdmin(email, password string) error {
+	if !s.IsFreshInstall() {
+		return errors.New("installation already completed")
+	}
+
+	hashed, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	user := models.User{
+		Email:    email,
+		Password: string(hashed),
+		Role:     "ADMIN",
+	}
+
+	return database.DB.Create(&user).Error
+}
+
+// Login logic
+func (s *AuthService) Authenticate(email, password string) (*models.User, error) {
+	var user models.User
+	err := database.DB.Where("email = ?", email).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("invalid credentials")
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	return &user, nil
+}
+-e 
+
+=== PATH: ./internal/services/databasus_client.go ===
+package services
+
+import (
+	"bytes"
+	"databasus-checker/internal/database"
+	"databasus-checker/internal/models"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+)
+
+type DatabasusClient struct{}
+
+// Structs
+type LoginRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+type WorkspaceDTO struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+type WorkspacesResponse struct {
+	Workspaces []WorkspaceDTO `json:"workspaces"`
+}
+type DatabaseDTO struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+}
+
+// Logic
+func (c *DatabasusClient) getToken(settings models.AppSettings) (string, error) {
+	reqBody, _ := json.Marshal(LoginRequest{
+		Email:    settings.DatabasusUser,
+		Password: settings.DatabasusPassword,
+	})
+	resp, err := http.Post(settings.DatabasusURL+"/api/v1/users/signin", "application/json", bytes.NewBuffer(reqBody))
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return "", errors.New("failed to login to databasus")
+	}
+	var loginResp LoginResponse
+	if err := json.NewDecoder(resp.Body).Decode(&loginResp); err != nil {
+		return "", err
+	}
+	return loginResp.Token, nil
+}
+
+func (c *DatabasusClient) GetWorkspaces() ([]WorkspaceDTO, error) {
+	settings := models.GetSettings(database.DB)
+	token, err := c.getToken(settings)
+	if err != nil {
+		return nil, err
+	}
+	req, _ := http.NewRequest("GET", settings.DatabasusURL+"/api/v1/workspaces", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, fmt.Errorf("api error %d", resp.StatusCode)
+	}
+	var result WorkspacesResponse
+	json.NewDecoder(resp.Body).Decode(&result)
+	return result.Workspaces, nil
+}
+
+func (c *DatabasusClient) GetDatabases(workspaceID string) ([]DatabaseDTO, error) {
+	settings := models.GetSettings(database.DB)
+	token, err := c.getToken(settings)
+	if err != nil {
+		return nil, err
+	}
+	url := fmt.Sprintf("%s/api/v1/databases?workspace_id=%s", settings.DatabasusURL, workspaceID)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return nil, errors.New("failed to fetch databases")
+	}
+	var result []DatabaseDTO
+	json.NewDecoder(resp.Body).Decode(&result)
+	return result, nil
+}
+
+// Test Storage Connection (MASIH PROXY - Sesuai request)
+func (c *DatabasusClient) TestStorageConnection(payload map[string]interface{}) error {
+	settings := models.GetSettings(database.DB)
+	token, err := c.getToken(settings)
+	if err != nil {
+		return err
+	}
+	reqBody, _ := json.Marshal(payload)
+	url := settings.DatabasusURL + "/api/v1/storages/direct-test"
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		body, _ := io.ReadAll(resp.Body)
+		var errResp map[string]interface{}
+		json.Unmarshal(body, &errResp)
+		if msg, ok := errResp["message"].(string); ok {
+			return errors.New(msg)
+		}
+		return fmt.Errorf("connection failed: %s", string(body))
+	}
+	return nil
+}
+-e 
+
+=== PATH: ./internal/database/postgres.go ===
+package database
+
+import (
+	"databasus-checker/internal/models"
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+)
+
+var DB *gorm.DB
+
+func Connect() {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=UTC",
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_USER"),
+		os.Getenv("DB_PASSWORD"),
+		os.Getenv("DB_NAME"),
+		os.Getenv("DB_PORT"),
+	)
+
+	var err error
+	// Retry logic: Tunggu database container siap
+	for i := 0; i < 10; i++ {
+		DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		})
+		if err == nil {
+			break
+		}
+		log.Printf("Failed to connect to DB, retrying in 2 seconds... (%d/10)", i+1)
+		time.Sleep(2 * time.Second)
+	}
+
+	if err != nil {
+		log.Fatal("Could not connect to database after retries: ", err)
+	}
+
+	log.Println("Successfully connected to internal database")
+	migrate()
+}
+
+func migrate() {
+	// Auto migrate schema
+	err := DB.AutoMigrate(
+		&models.User{},
+		&models.AppSettings{},
+		&models.RestoreTestConfig{},
+		&models.StorageConfig{},
+		&models.NotificationConfig{},
+		// Nanti kita tambah models lain disini (Queue, StorageConfig, dll)
+	)
+	if err != nil {
+		log.Fatal("Migration failed: ", err)
+	}
+}
+-e 
+
+=== PATH: ./internal/utils/jwt.go ===
+package utils
+
+import (
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
+)
+
+// Di production, value ini harusnya dari ENV
+var SecretKey = []byte("RAHASIA_DAPUR_DATABASUS_CHECKER_2026")
+
+type JwtCustomClaims struct {
+	UserID string `json:"user_id"`
+	Role   string `json:"role"`
+	jwt.RegisteredClaims
+}
+
+func GenerateToken(userID, role string) (string, error) {
+	claims := &JwtCustomClaims{
+		userID,
+		role,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)), // Login valid 1 hari
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(SecretKey)
+}
+
+func ValidateToken(tokenString string) (*JwtCustomClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return SecretKey, nil
+	})
+
+	if claims, ok := token.Claims.(*JwtCustomClaims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, err
+}
+-e 
+
+=== PATH: ./internal/utils/notification.go ===
+package utils
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/smtp"
+	"time"
+)
+
+// --- Telegram Logic ---
+
+type TelegramPayload struct {
+	ChatID string `json:"chat_id"`
+	Text   string `json:"text"`
+}
+
+func SendTelegram(token, chatID, message string) error {
+	apiURL := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", token)
+	payload := TelegramPayload{
+		ChatID: chatID,
+		Text:   message,
+	}
+
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Post(apiURL, "application/json", bytes.NewBuffer(data))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("telegram api error: status code %d", resp.StatusCode)
+	}
+
+	return nil
+}
+
+// --- Email Logic ---
+
+func SendEmail(host string, port int, user, password, from, to, subject, body string) error {
+	auth := smtp.PlainAuth("", user, password, host)
+	addr := fmt.Sprintf("%s:%d", host, port)
+
+	msg := []byte("To: " + to + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"MIME-Version: 1.0\r\n" +
+		"Content-Type: text/plain; charset=\"utf-8\"\r\n" +
+		"\r\n" +
+		body + "\r\n")
+
+	// Jika port 465 (SSL/Implicit TLS) biasanya butuh penanganan khusus,
+	// tapi untuk starttls standar (587) kode ini cukup.
+	// Untuk kestabilan di tool sederhana, kita pakai standard library net/smtp.
+	err := smtp.SendMail(addr, auth, from, []string{to}, msg)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+-e 
+
+=== PATH: ./internal/models/user.go ===
+package models
+
+import (
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
+// Base model dengan UUID
+type Base struct {
+	ID        uuid.UUID `gorm:"type:uuid;primary_key;"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+// User model untuk login dashboard
+type User struct {
+	Base
+	Email    string `gorm:"uniqueIndex;not null"`
+	Password string `gorm:"not null"` // Bcrypt Hash
+	Role     string `gorm:"default:'ADMIN'"`
+}
+
+// Hook untuk generate UUID sebelum create
+func (base *Base) BeforeCreate(tx *gorm.DB) (err error) {
+	base.ID = uuid.New()
+	return
+}
+-e 
+
+=== PATH: ./internal/models/notification_config.go ===
+package models
+
+// Kita gunakan JSONMap yang sama dengan StorageConfig
+// Pastikan struct ini ada di package models
+
+type NotificationConfig struct {
+	Base
+	Name   string  `gorm:"not null"`
+	Type   string  `gorm:"not null"` // TELEGRAM, EMAIL
+	Config JSONMap `gorm:"type:jsonb"`
+}
+-e 
+
+=== PATH: ./internal/models/storage_config.go ===
+package models
+
+import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
+)
+
+// Helper untuk menyimpan Map (JSON Object) di Database
+type JSONMap map[string]interface{}
+
+func (m *JSONMap) Scan(value interface{}) error {
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
+	}
+	return json.Unmarshal(bytes, m)
+}
+
+func (m JSONMap) Value() (driver.Value, error) {
+	return json.Marshal(m)
+}
+
+type StorageConfig struct {
+	Base
+	Name   string  `gorm:"not null"`
+	Type   string  `gorm:"not null"` // S3, NAS, FTP, SFTP, RCLONE
+	Config JSONMap `gorm:"type:jsonb"`
+}
+-e 
+
+=== PATH: ./internal/models/restore_config.go ===
+package models
+
+import (
+	"gorm.io/gorm"
+)
+
+type RestoreTestConfig struct {
+	gorm.Model
+	Name                  string `gorm:"not null"`
+	WorkspaceID           string `gorm:"not null"`
+	DatabasusDatabaseID   string `gorm:"not null;uniqueIndex"`
+	DatabasusDatabaseName string
+
+	// Scripts
+	PreRestoreScript  string `gorm:"type:text"`
+	PostRestoreScript string `gorm:"type:text"`
+
+	// Relations (Single ID karena file hanya diupload ke 1 tempat)
+	StorageID      *uint // Pointer agar bisa NULL (jika user tidak mau upload)
+	NotificationID *uint // Pointer agar bisa NULL
+
+	// State Polling
+	LastProcessedBackupID string
+}
+-e 
+
+=== PATH: ./internal/models/settings.go ===
+package models
+
+import "gorm.io/gorm"
+
+type AppSettings struct {
+	Base
+	DatabasusURL      string
+	DatabasusUser     string
+	DatabasusPassword string
+	AppTimezone       string
+	DatabasusTimezone string
+	LogRetentionDays  int
+}
+
+// Helper (Tetap sama)
+func GetSettings(db *gorm.DB) AppSettings {
+	var settings AppSettings
+	if err := db.First(&settings).Error; err != nil {
+		settings = AppSettings{
+			DatabasusURL:      "http://host.docker.internal:4005",
+			AppTimezone:       "Asia/Jakarta",
+			DatabasusTimezone: "UTC",
+			LogRetentionDays:  30,
+		}
+		db.Create(&settings)
+	}
+	return settings
+}
+-e 
+
+=== PATH: ./go.sum ===
+github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
+github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/golang-jwt/jwt/v5 v5.3.1 h1:kYf81DTWFe7t+1VvL7eS+jKFVWaUnK9cB1qbwn63YCY=
+github.com/golang-jwt/jwt/v5 v5.3.1/go.mod h1:fxCRLWMO43lRc8nhHWY6LGqRcf+1gQWArsqaEUEa5bE=
+github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
+github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
+github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
+github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=
+github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761/go.mod h1:5TJZWKEWniPve33vlWYSoGYefn3gLQRzjfDlhSJ9ZKM=
+github.com/jackc/pgx/v5 v5.6.0 h1:SWJzexBzPL5jb0GEsrPMLIsi/3jOo7RHlzTjcAeDrPY=
+github.com/jackc/pgx/v5 v5.6.0/go.mod h1:DNZ/vlrUnhWCoFGxHAG8U2ljioxukquj7utPDgtQdTw=
+github.com/jackc/puddle/v2 v2.2.2 h1:PR8nw+E/1w0GLuRFSmiioY6UooMp6KJv0/61nB7icHo=
+github.com/jackc/puddle/v2 v2.2.2/go.mod h1:vriiEXHvEE654aYKXXjOvZM39qJ0q+azkZFrfEOc3H4=
+github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
+github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
+github.com/jinzhu/now v1.1.5 h1:/o9tlHleP7gOFmsnYNz3RGnqzefHA47wQpKrrdTIwXQ=
+github.com/jinzhu/now v1.1.5/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/labstack/echo/v4 v4.15.0 h1:hoRTKWcnR5STXZFe9BmYun9AMTNeSbjHi2vtDuADJ24=
+github.com/labstack/echo/v4 v4.15.0/go.mod h1:xmw1clThob0BSVRX1CRQkGQ/vjwcpOMjQZSZa9fKA/c=
+github.com/labstack/gommon v0.4.2 h1:F8qTUNXgG1+6WQmqoUWnz8WiEU60mXVVw0P4ht1WRA0=
+github.com/labstack/gommon v0.4.2/go.mod h1:QlUFxVM+SNXhDL/Z7YhocGIBYOiwB0mXm1+1bAPHPyU=
+github.com/mattn/go-colorable v0.1.14 h1:9A9LHSqF/7dyVVX6g0U9cwm9pG3kP9gSzcuIPHPsaIE=
+github.com/mattn/go-colorable v0.1.14/go.mod h1:6LmQG8QLFO4G5z1gPvYEzlUgJ2wF+stgPZH1UqBm1s8=
+github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
+github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
+github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
+github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
+github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
+github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
+github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
+github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
+github.com/valyala/fasttemplate v1.2.2 h1:lxLXG0uE3Qnshl9QyaK6XJxMXlQZELvChBOCmQD0Loo=
+github.com/valyala/fasttemplate v1.2.2/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
+golang.org/x/crypto v0.47.0 h1:V6e3FRj+n4dbpw86FJ8Fv7XVOql7TEwpHapKoMJ/GO8=
+golang.org/x/crypto v0.47.0/go.mod h1:ff3Y9VzzKbwSSEzWqJsJVBnWmRwRSHt/6Op5n9bQc4A=
+golang.org/x/net v0.48.0 h1:zyQRTTrjc33Lhh0fBgT/H3oZq9WuvRR5gPC70xpDiQU=
+golang.org/x/net v0.48.0/go.mod h1:+ndRgGjkh8FGtu1w1FGbEC31if4VrNVMuKTgcAAnQRY=
+golang.org/x/sync v0.19.0 h1:vV+1eWNmZ5geRlYjzm2adRgW2/mcpevXNg50YZtPCE4=
+golang.org/x/sync v0.19.0/go.mod h1:9KTHXmSnoGruLpwFjVSX0lNNA75CykiMECbovNTZqGI=
+golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.40.0 h1:DBZZqJ2Rkml6QMQsZywtnjnnGvHza6BTfYFWY9kjEWQ=
+golang.org/x/sys v0.40.0/go.mod h1:OgkHotnGiDImocRcuBABYBEXf8A9a87e/uXjp9XT3ks=
+golang.org/x/text v0.33.0 h1:B3njUFyqtHDUI5jMn1YIr5B0IE2U0qck04r6d4KPAxE=
+golang.org/x/text v0.33.0/go.mod h1:LuMebE6+rBincTi9+xWTY8TztLzKHc/9C1uBCG27+q8=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+gorm.io/driver/postgres v1.6.0 h1:2dxzU8xJ+ivvqTRph34QX+WrRaJlmfyPqXmoGVjMBa4=
+gorm.io/driver/postgres v1.6.0/go.mod h1:vUw0mrGgrTK+uPHEhAdV4sfFELrByKVGnaVRkXDhtWo=
+gorm.io/gorm v1.31.1 h1:7CA8FTFz/gRfgqgpeKIBcervUn3xSyPUmr6B2WXJ7kg=
+gorm.io/gorm v1.31.1/go.mod h1:XyQVbO2k6YkOis7C2437jSit3SsDK72s7n7rsSHd+Gs=
+-e 
+

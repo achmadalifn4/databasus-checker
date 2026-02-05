@@ -1,0 +1,41 @@
+{{define "title"}}Installation Wizard{{end}}
+{{define "subtitle"}}Setup your initial administrator account{{end}}
+
+{{define "content"}}
+<div class="mb-6 bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex gap-3">
+    <svg class="w-5 h-5 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <p class="text-xs text-blue-200 leading-relaxed">
+        Welcome! Since this is your first time running Databasus Checker, please create an admin account to secure your dashboard.
+    </p>
+</div>
+
+<form action="/api/install" method="POST" class="space-y-5">
+    <div>
+        <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Admin Email</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path></svg>
+            </div>
+            <input type="text" id="email" name="email" required placeholder="admin@company.com"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm">
+        </div>
+    </div>
+
+    <div>
+        <label for="password" class="block text-sm font-medium text-slate-300 mb-1.5">Master Password</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </div>
+            <input type="password" id="password" name="password" required placeholder="••••••••" minlength="8"
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-4 py-2.5 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all sm:text-sm">
+        </div>
+        <p class="mt-1.5 text-xs text-slate-500">Minimum 8 characters required.</p>
+    </div>
+
+    <button type="submit" 
+        class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 px-4 rounded-lg transition-all duration-200 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 mt-2">
+        Complete Installation
+    </button>
+</form>
+{{end}}

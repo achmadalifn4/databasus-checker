@@ -1,0 +1,90 @@
+{{define "dashboard_layout"}}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Databasus Checker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        slate: { 800: '#1e293b', 850: '#172033', 900: '#0f172a' } // Added slate-850 for subtle contrast
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-300 font-sans antialiased flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-slate-800 border-r border-slate-700/50 flex flex-col flex-shrink-0 shadow-xl z-20">
+        <div class="h-16 flex items-center px-6 border-b border-slate-700/50">
+            <span class="text-lg font-bold text-slate-50 tracking-tight flex items-center gap-2">
+                <div class="w-6 h-6 bg-blue-600 rounded-md flex items-center justify-center text-xs text-white">DB</div>
+                Databasus <span class="text-blue-500">Checker</span>
+            </span>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+            {{$active := .activeMenu}}
+            
+            <a href="/" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "dashboard"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                Dashboard
+            </a>
+
+            <div class="pt-6 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Operations</div>
+            
+            <a href="/tests" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "tests"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Tests
+            </a>
+            <a href="/queue" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "queue"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Queue
+            </a>
+
+            <div class="pt-6 pb-2 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Configuration</div>
+            
+            <a href="/storage" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "storage"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                Storage
+            </a>
+            <a href="/notifications" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "notifications"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                Notifications
+            </a>
+            <a href="/settings" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all {{if eq $active "settings"}}bg-blue-600 text-white shadow-md shadow-blue-500/20{{else}}text-slate-400 hover:bg-slate-700/50 hover:text-slate-200{{end}}">
+                <svg class="w-5 h-5 mr-3 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                Settings
+            </a>
+        </nav>
+
+        <div class="border-t border-slate-700/50 p-4">
+            <a href="/logout" class="flex items-center justify-center w-full px-4 py-2 text-sm font-medium text-red-400 bg-slate-700/30 rounded-lg hover:bg-red-500/10 hover:text-red-300 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Sign Out
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-900 relative">
+        <div class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-slate-900 to-transparent pointer-events-none z-10"></div>
+        
+        <div class="flex-1 overflow-auto p-8 lg:p-10">
+            <div class="max-w-5xl mx-auto">
+                {{template "content" .}}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+{{end}}
