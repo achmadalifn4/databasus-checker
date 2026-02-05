@@ -43,8 +43,6 @@ func (s *QueueService) GetPendingJob() (*models.Job, error) {
 	var job models.Job
 
 	err := database.DB.Transaction(func(tx *gorm.DB) error {
-		// 1. Cari ID Job yang pending (Hanya ambil ID saja biar ringan)
-		// Kita Preload nanti di luar transaksi atau setelah dapat ID
 		result := tx.Set("gorm:query_option", "FOR UPDATE SKIP LOCKED").
 			Where("status = ?", "PENDING").
 			Order("created_at asc").
@@ -54,8 +52,6 @@ func (s *QueueService) GetPendingJob() (*models.Job, error) {
 			return result.Error
 		}
 
-		// 2. Update status langsung via Query SQL murni (Paling aman dari side-effect GORM)
-		// "UPDATE jobs SET status='RUNNING', started_at=NOW() WHERE id = ?"
 		now := time.Now()
 		if err := tx.Model(&models.Job{}).Where("id = ?", job.ID).Updates(map[string]interface{}{
 			"status":     "RUNNING",
@@ -64,22 +60,18 @@ func (s *QueueService) GetPendingJob() (*models.Job, error) {
 			return err
 		}
 		
-		// Update struct lokal biar return-nya bener
 		job.Status = "RUNNING"
 		job.StartedAt = &now
-		
 		return nil
 	})
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil // Silent
+			return nil, nil
 		}
 		return nil, err
 	}
 
-	// 3. Setelah status running, baru kita load data lengkap (termasuk Config)
-	// Ini aman karena kita cuma Read (First), tidak Save
 	var fullJob models.Job
 	if err := database.DB.Preload("RestoreTestConfig").First(&fullJob, "id = ?", job.ID).Error; err != nil {
 		return nil, err
@@ -89,13 +81,26 @@ func (s *QueueService) GetPendingJob() (*models.Job, error) {
 }
 
 func (s *QueueService) UpdateJob(job *models.Job) {
-	// PENTING: Gunakan Select spesifik kolom untuk update hasil akhir
-	// Jangan pakai Omit, lebih baik whitelist kolom yang mau diubah
 	database.DB.Model(job).Select("status", "finished_at", "duration_seconds", "log_output", "last_processed_backup_id").Updates(job)
 }
 
-func (s *QueueService) GetAllJobs() ([]models.Job, error) {
+// GetActiveJobs: Hanya mengambil job yang PENDING atau RUNNING untuk menu Queue
+func (s *QueueService) GetActiveJobs() ([]models.Job, error) {
 	var jobs []models.Job
-	err := database.DB.Preload("RestoreTestConfig").Order("created_at desc").Limit(50).Find(&jobs).Error
+	err := database.DB.Preload("RestoreTestConfig").
+		Where("status IN ?", []string{"PENDING", "RUNNING"}).
+		Order("created_at asc").
+		Find(&jobs).Error
+	return jobs, err
+}
+
+// GetJobHistory: Hanya mengambil job yang SUCCESS atau FAILED untuk menu Dashboard
+func (s *QueueService) GetJobHistory(limit int) ([]models.Job, error) {
+	var jobs []models.Job
+	err := database.DB.Preload("RestoreTestConfig").
+		Where("status IN ?", []string{"SUCCESS", "FAILED"}).
+		Order("finished_at desc").
+		Limit(limit).
+		Find(&jobs).Error
 	return jobs, err
 }

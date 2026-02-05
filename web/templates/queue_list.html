@@ -1,7 +1,7 @@
 {{define "content"}}
 <div class="mb-8">
-    <h1 class="text-2xl font-bold text-white tracking-tight">Job Queue</h1>
-    <p class="text-slate-400 mt-1 text-sm">Monitor running and past restore tasks.</p>
+    <h1 class="text-2xl font-bold text-white tracking-tight">Active Queue</h1>
+    <p class="text-slate-400 mt-1 text-sm">Real-time monitor of pending and running tasks.</p>
 </div>
 
 <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-sm">
@@ -11,39 +11,42 @@
                 <th class="px-6 py-4">Job ID</th>
                 <th class="px-6 py-4">Test Name</th>
                 <th class="px-6 py-4">Status</th>
-                <th class="px-6 py-4">Duration</th>
                 <th class="px-6 py-4">Started At</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-slate-700/50 text-slate-300 text-sm">
             {{range .Jobs}}
-            <tr class="hover:bg-slate-700/20 transition-colors">
+            <tr class="hover:bg-slate-700/20 transition-colors animate-pulse bg-slate-800/50">
                 <td class="px-6 py-4 font-mono text-xs text-slate-500">{{.ID}}</td>
                 <td class="px-6 py-4 font-medium text-white">{{.RestoreTestConfig.Name}}</td>
                 <td class="px-6 py-4">
-                    {{if eq .Status "SUCCESS"}}
-                        <span class="inline-flex items-center px-2 py-1 rounded bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">SUCCESS</span>
-                    {{else if eq .Status "FAILED"}}
-                        <span class="inline-flex items-center px-2 py-1 rounded bg-red-500/10 text-red-400 text-xs font-medium border border-red-500/20">FAILED</span>
-                    {{else if eq .Status "RUNNING"}}
-                        <span class="inline-flex items-center px-2 py-1 rounded bg-blue-500/10 text-blue-400 text-xs font-medium border border-blue-500/20 animate-pulse">RUNNING</span>
+                    {{if eq .Status "RUNNING"}}
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-bold border border-blue-500/20">
+                            <span class="w-2 h-2 rounded-full bg-blue-400 mr-2 animate-ping"></span>
+                            RUNNING
+                        </span>
                     {{else}}
-                        <span class="inline-flex items-center px-2 py-1 rounded bg-slate-600/30 text-slate-400 text-xs font-medium border border-slate-600">PENDING</span>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-slate-600/30 text-slate-300 text-xs font-medium border border-slate-600">
+                            PENDING
+                        </span>
                     {{end}}
                 </td>
-                <td class="px-6 py-4">{{if .DurationSeconds}}{{.DurationSeconds}}s{{else}}-{{end}}</td>
                 <td class="px-6 py-4 text-xs text-slate-400">
                     {{if .StartedAt}}
-                        {{.StartedAt.Format "02 Jan 15:04:05"}}
+                        {{.StartedAt.Format "15:04:05"}}
                     {{else}}
-                        -
+                        Waiting...
                     {{end}}
                 </td>
             </tr>
             {{else}}
             <tr>
-                <td colspan="5" class="px-6 py-12 text-center text-slate-500">
-                    No jobs found.
+                <td colspan="4" class="px-6 py-16 text-center text-slate-500">
+                    <div class="flex flex-col items-center justify-center opacity-50">
+                        <svg class="w-12 h-12 text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <p class="font-medium text-slate-400">All caught up!</p>
+                        <p class="text-xs mt-1">No tasks are currently running.</p>
+                    </div>
                 </td>
             </tr>
             {{end}}
@@ -54,6 +57,6 @@
 <script>
     setTimeout(function(){
        window.location.reload(1);
-    }, 5000);
+    }, 3000);
 </script>
 {{end}}

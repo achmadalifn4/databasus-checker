@@ -186,7 +186,7 @@ func (c *DatabasusClient) GetLatestBackup(databaseID string) (*BackupDTO, error)
 		return nil, err
 	}
 
-	// Filter by database_id, sort desc, limit 1
+	// FIXED: Urutkan berdasarkan created_at desc untuk ambil yg terbaru
 	url := fmt.Sprintf("%s/api/v1/backups?database_id=%s&limit=1&sort=created_at:desc", settings.DatabasusURL, databaseID)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Set("Authorization", "Bearer "+token)
@@ -211,9 +211,9 @@ func (c *DatabasusClient) GetLatestBackup(databaseID string) (*BackupDTO, error)
 		return nil, errors.New("no backups found for this database")
 	}
 
-	// Pastikan statusnya SUCCESS
-	if result.Backups[0].Status != "SUCCESS" {
-		return nil, errors.New("latest backup status is not SUCCESS")
+	// FIXED: Cek status COMPLETED (sesuai curl user)
+	if result.Backups[0].Status != "COMPLETED" && result.Backups[0].Status != "SUCCESS" {
+		return nil, fmt.Errorf("latest backup status is %s (not COMPLETED)", result.Backups[0].Status)
 	}
 
 	return &result.Backups[0], nil
@@ -244,8 +244,8 @@ func (c *DatabasusClient) TriggerRestore(backupID string, targetHost string, tar
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 
-	// Timeout panjang karena trigger restore harusnya cepat (async), tapi jaga-jaga
-	client := &http.Client{Timeout: 60 * time.Second}
+	// Restore trigger should be fast
+	client := &http.Client{Timeout: 30 * time.Second}
 
 	resp, err := client.Do(req)
 	if err != nil {

@@ -126,10 +126,19 @@ func main() {
 		return c.Redirect(http.StatusFound, "/login")
 	})
 
-	// --- DASHBOARD ROUTES ---
+	// ==========================================
+	// --- DASHBOARD & SERVICES INIT ---
+	// ==========================================
 
+	databasusClient := services.DatabasusClient{}
+	queueService := services.QueueService{}
+
+	// Route Dashboard (Menampilkan History Log)
 	e.GET("/", func(c echo.Context) error {
-		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "dashboard_index.html", nil, "dashboard")
+		history, _ := queueService.GetJobHistory(20) // Get last 20 logs
+		return e.Renderer.(*TemplateRenderer).RenderDashboard(c.Response().Writer, "dashboard_index.html", echo.Map{
+			"History": history,
+		}, "dashboard")
 	})
 
 	e.GET("/settings", func(c echo.Context) error {
@@ -155,9 +164,6 @@ func main() {
 	// ==========================================
 	// --- RESTORE TESTS (CRUD) ---
 	// ==========================================
-
-	databasusClient := services.DatabasusClient{}
-	queueService := services.QueueService{}
 
 	e.GET("/tests", func(c echo.Context) error {
 		var tests []models.RestoreTestConfig
@@ -191,16 +197,14 @@ func main() {
 		return c.JSON(http.StatusOK, dbs)
 	})
 
-	// --- TRIGGER MANUAL RUN (FIXED: UUID) ---
+	// --- TRIGGER MANUAL RUN ---
 	e.POST("/api/tests/:id/run", func(c echo.Context) error {
 		idParam := c.Param("id")
-		// Jangan diconvert ke int (strconv.Atoi) karena ID adalah UUID string
-
+		// ID sudah UUID, jangan convert ke int
 		_, err := queueService.Enqueue(idParam)
 		if err != nil {
 			return c.Redirect(http.StatusFound, "/tests?error="+err.Error())
 		}
-
 		return c.Redirect(http.StatusFound, "/tests?success=Test+queued+successfully")
 	})
 
@@ -552,9 +556,9 @@ func main() {
 		return c.JSON(http.StatusOK, map[string]string{"message": "Test notification sent successfully!"})
 	})
 
-	// --- QUEUE ROUTE (FIXED) ---
+	// --- QUEUE ROUTE (Queue Only) ---
 	e.GET("/queue", func(c echo.Context) error {
-		jobs, err := queueService.GetAllJobs()
+		jobs, err := queueService.GetActiveJobs()
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
